@@ -21,7 +21,9 @@ CHECKSUMS="${MTA_CHECKSUMS:-}"
 [ -z "$CHECKSUMS" ] && { [ "$SCOPE" = "all" ] && CHECKSUMS=1 || CHECKSUMS=0; }
 
 DATE="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-LDFLAGS="-s -w -X github.com/simtabi/ms-teams-activity/internal/cli.version=${VERSION} -X github.com/simtabi/ms-teams-activity/internal/cli.date=${DATE}"
+COMMIT="$(git rev-parse --short HEAD 2>/dev/null || echo none)"
+P=github.com/simtabi/ms-teams-activity/internal/cli
+LDFLAGS="-s -w -X ${P}.version=${VERSION} -X ${P}.date=${DATE} -X ${P}.commit=${COMMIT}"
 host_os="$(go env GOOS)"; host_arch="$(go env GOARCH)"
 mkdir -p dist out
 
