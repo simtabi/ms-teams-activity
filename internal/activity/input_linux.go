@@ -36,10 +36,24 @@ func (l *linuxInput) Name() string { return "input(linux:uinput)" }
 func (l *linuxInput) Tick(_ context.Context) error {
 	l.mu.Lock()
 	defer l.mu.Unlock()
-	if err := l.mouse.MoveRight(1); err != nil {
+	n := int32(abs(naturalDelta())) // varied magnitude 1..3
+	if naturalVertical() {
+		if err := l.mouse.MoveUp(n); err != nil {
+			return err
+		}
+		return l.mouse.MoveDown(n)
+	}
+	if err := l.mouse.MoveRight(n); err != nil {
 		return err
 	}
-	return l.mouse.MoveLeft(1)
+	return l.mouse.MoveLeft(n)
+}
+
+func abs(n int) int {
+	if n < 0 {
+		return -n
+	}
+	return n
 }
 
 func (l *linuxInput) Stop(_ context.Context) error {

@@ -103,8 +103,8 @@ func (d *darwinInput) Tick(_ context.Context) error {
 		C.pressF15()
 	case config.MethodZen:
 		C.nudge(0)
-	default: // MethodMouse
-		C.nudge(1)
+	default: // MethodMouse — varied small offset for natural movement
+		C.nudge(C.int(naturalDelta()))
 	}
 	return nil
 }

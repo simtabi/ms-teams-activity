@@ -8,8 +8,10 @@ Enable it with `"engine": "input"` (or `"both"`).
 
 ## Methods
 
-- `mouse` (default) — a tiny real relative move that immediately returns to
-  origin. Most reliable for apps with their own idle detection.
+- `mouse` (default) — a tiny **real** relative move that immediately returns to
+  origin. The offset is varied (1–3 px, random direction) and the interval is
+  jittered, so movement is natural rather than mechanically identical each tick.
+  Most reliable for apps with their own idle detection.
 - `key` — taps **F15**, a key with no default action.
 - `zen` — an in-place/zero-delta nudge. Least intrusive, but some idle detectors
   ignore it. Opt-in.

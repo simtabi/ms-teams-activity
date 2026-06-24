@@ -96,11 +96,16 @@ func (w *windowsInput) Tick(_ context.Context) error {
 		return sendKey(vkF15)
 	case config.MethodZen:
 		return sendMouseMove(0, 0)
-	default: // MethodMouse — a real small move that returns to origin.
-		if err := sendMouseMove(4, 0); err != nil {
+	default: // MethodMouse — a real, varied small move that returns to origin.
+		d := int32(naturalDelta())
+		dx, dy := d, int32(0)
+		if naturalVertical() {
+			dx, dy = 0, d
+		}
+		if err := sendMouseMove(dx, dy); err != nil {
 			return err
 		}
-		return sendMouseMove(-4, 0)
+		return sendMouseMove(-dx, -dy)
 	}
 }
 
