@@ -38,7 +38,7 @@ trap 'rm -rf "$tmp"' EXIT
 
 echo "Downloading ${asset}..."
 if curl -fsSL "${BASE}/${asset}" -o "${tmp}/${asset}" && curl -fsSL "${BASE}/checksums.txt" -o "${tmp}/checksums.txt"; then
-  want=$(grep " ${asset}\$" "${tmp}/checksums.txt" | awk '{print $1}' | head -1)
+  want=$(awk -v a="$asset" '$NF==a || $NF=="./"a {print $1; exit}' "${tmp}/checksums.txt")
   if [ -z "$want" ]; then echo "checksum for ${asset} not found" >&2; exit 1; fi
   echo "Verifying checksum..."
   sha_check "${tmp}/${asset}" "$want"

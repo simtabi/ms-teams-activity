@@ -101,7 +101,8 @@ fi
 
 cp out/* dist/ 2>/dev/null || true
 if [ "$CHECKSUMS" = "1" ]; then
-  ( cd dist && shasum -a 256 ./*.tar.gz ./*.zip ./*.deb ./*.rpm 2>/dev/null > checksums.txt || true )
+  # Bare filenames so install scripts and self-update can look assets up by name.
+  ( cd dist && shasum -a 256 -- *.tar.gz *.zip *.deb *.rpm 2>/dev/null > checksums.txt || true )
 fi
 
 echo

@@ -35,7 +35,9 @@ jobs:
         run: |
           set -euo pipefail
           TAG="${{ github.event.inputs.tag || github.ref_name }}"
-          cd collected && sha256sum ./* > checksums.txt && cd ..
+          # Bare filenames (no ./ prefix) so install scripts and self-update can
+          # look assets up by name.
+          cd collected && sha256sum mta_* > checksums.txt && cd ..
           VERSION="${TAG#v}"
           awk -v ver="$VERSION" '
             $0 ~ "^## \\[" ver "\\]" {grab=1; next}
