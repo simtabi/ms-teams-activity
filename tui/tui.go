@@ -32,6 +32,13 @@ func Run(opts Options) error {
 
 type tickMsg time.Time
 
+type viewMode int
+
+const (
+	modeDashboard viewMode = iota
+	modeEditor
+)
+
 type model struct {
 	opts   Options
 	status control.Status
@@ -42,6 +49,12 @@ type model struct {
 	flash  string
 	width  int
 	height int
+
+	// Editor state (active when mode == modeEditor).
+	mode   viewMode
+	edit   config.Config // working copy being edited
+	winIdx int           // selected schedule window
+	field  int           // selected field: 0=days 1=start 2=end
 }
 
 func newModel(opts Options) model {
@@ -70,8 +83,11 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.refresh()
 		return m, tick()
 	case tea.KeyMsg:
+		if m.mode == modeEditor {
+			return m.updateEditor(msg)
+		}
 		switch msg.String() {
-		case "q", "ctrl+c", "esc":
+		case "q", "ctrl+c":
 			return m, tea.Quit
 		case "o":
 			m.setOverride(schedule.OverrideOn)
@@ -84,6 +100,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.flash = "override cleared"
 			}
 			m.refresh()
+		case "e":
+			m.enterEditor()
 		}
 	}
 	return m, nil
@@ -110,6 +128,9 @@ var (
 )
 
 func (m model) View() string {
+	if m.mode == modeEditor {
+		return m.editorView()
+	}
 	var b strings.Builder
 	b.WriteString(titleStyle.Render("  MS Teams Activity") + "  " + helpStyle.Render("scope="+string(m.opts.Scope)) + "\n\n")
 
@@ -120,7 +141,7 @@ func (m model) View() string {
 	if m.flash != "" {
 		b.WriteString(flashStyle.Render("• "+m.flash) + "\n")
 	}
-	b.WriteString(helpStyle.Render("[o] force on   [f] force off   [r] resume schedule   [q] quit"))
+	b.WriteString(helpStyle.Render("[o] force on   [f] force off   [r] resume   [e] edit schedule   [q] quit"))
 	return b.String()
 }
 
