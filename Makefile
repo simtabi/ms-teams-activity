@@ -4,7 +4,7 @@ VERSION ?= $(shell git describe --tags --always --dirty 2>/dev/null || echo dev)
 LDFLAGS := -s -w -X $(PKG)/internal/cli.version=$(VERSION)
 MAIN := ./cmd/mta
 
-.PHONY: build test vet fmt lint cross install clean
+.PHONY: build test vet fmt lint cross dist install clean
 
 build: ## Build the binary for the current OS
 	go build -trimpath -ldflags "$(LDFLAGS)" -o $(BINARY) $(MAIN)
@@ -22,6 +22,9 @@ cross: ## Cross-compile the cgo-free targets as a smoke check
 	CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build ./...
 	CGO_ENABLED=0 GOOS=linux   GOARCH=amd64 go build ./...
 	CGO_ENABLED=0 GOOS=linux   GOARCH=arm64 go build ./...
+
+dist: ## Build ready-to-run binaries for all targets into ./dist
+	./scripts/build-all.sh
 
 install: build ## Build and install to /usr/local/bin (may need sudo)
 	install -m 0755 $(BINARY) /usr/local/bin/$(BINARY)
