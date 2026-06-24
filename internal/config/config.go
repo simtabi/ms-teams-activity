@@ -78,6 +78,9 @@ type InputConfig struct {
 	JitterSeconds   int         `json:"jitter_seconds"`
 	Method          InputMethod `json:"method"`
 	PreventSleep    bool        `json:"prevent_sleep"`
+	// MovePixels is the maximum magnitude (px) of the mouse nudge; each tick
+	// uses a random 1..MovePixels offset and returns to origin.
+	MovePixels int `json:"move_pixels"`
 }
 
 // GraphConfig holds Microsoft Graph engine settings.
@@ -123,6 +126,7 @@ func Default() Config {
 			JitterSeconds:   25,
 			Method:          MethodMouse,
 			PreventSleep:    true,
+			MovePixels:      3,
 		},
 		Graph: GraphConfig{
 			TenantID:       "common",
@@ -274,8 +278,17 @@ func (in InputConfig) validate() error {
 	default:
 		return fmt.Errorf("input.method: must be one of mouse|key|zen, got %q", in.Method)
 	}
+	if in.MovePixels < 1 || in.MovePixels > 50 {
+		return fmt.Errorf("input.move_pixels: must be in [1,50], got %d", in.MovePixels)
+	}
 	return nil
 }
+
+// Supported Graph presence values.
+var (
+	validAvailability = []string{"Available", "Busy", "DoNotDisturb", "BeRightBack", "Away", "Offline"}
+	validActivity     = []string{"Available", "Busy", "DoNotDisturb", "BeRightBack", "Away", "OffWork"}
+)
 
 func (g GraphConfig) validate() error {
 	if strings.TrimSpace(g.ClientID) == "" {
@@ -289,6 +302,12 @@ func (g GraphConfig) validate() error {
 	}
 	if _, err := ParseISODuration(g.Expiration); err != nil {
 		return fmt.Errorf("graph.expiration: %w", err)
+	}
+	if !slices.Contains(validAvailability, g.Availability) {
+		return fmt.Errorf("graph.availability: must be one of %s", strings.Join(validAvailability, ", "))
+	}
+	if !slices.Contains(validActivity, g.Activity) {
+		return fmt.Errorf("graph.activity: must be one of %s", strings.Join(validActivity, ", "))
 	}
 	return nil
 }

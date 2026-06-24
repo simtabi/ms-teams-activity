@@ -14,7 +14,10 @@ import (
 	"gopkg.in/natefinch/lumberjack.v2"
 )
 
-var flagForeground bool
+var (
+	flagForeground bool
+	flagDryRun     bool
+)
 
 var runCmd = &cobra.Command{
 	Use:   "run",
@@ -47,7 +50,10 @@ var runCmd = &cobra.Command{
 		defer func() { _ = lock.Release() }()
 
 		log := newLogger(cfg, rt)
-		eng := engine.New(scope(), cfgPath, rt, tokenPath, log)
+		if flagDryRun {
+			log.Info("dry-run mode: no input/graph actions will be performed")
+		}
+		eng := engine.New(scope(), cfgPath, rt, tokenPath, flagDryRun, log)
 
 		params := service.Params{Scope: scope(), ConfigPath: cfgPath, UsesInput: cfg.UsesInput()}
 		return service.Run(params, eng)
@@ -56,6 +62,7 @@ var runCmd = &cobra.Command{
 
 func init() {
 	runCmd.Flags().BoolVar(&flagForeground, "foreground", false, "(reserved) force foreground execution")
+	runCmd.Flags().BoolVar(&flagDryRun, "dry-run", false, "log intended actions without injecting input or calling Graph")
 	rootCmd.AddCommand(runCmd)
 }
 
@@ -79,6 +86,9 @@ func newLogger(cfg config.Config, rt string) *slog.Logger {
 		lvl = slog.LevelError
 	default:
 		lvl = slog.LevelInfo
+	}
+	if flagVerbose {
+		lvl = slog.LevelDebug
 	}
 	return slog.New(slog.NewTextHandler(w, &slog.HandlerOptions{Level: lvl}))
 }

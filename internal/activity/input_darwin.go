@@ -8,16 +8,16 @@ package activity
 #include <IOKit/pwr_mgt/IOPMLib.h>
 #include <ApplicationServices/ApplicationServices.h>
 
-// nudge posts a synthetic mouse-moved event. dx is the pixel delta applied and
-// immediately reverted, so the cursor returns to its original position. dx==0
-// posts an in-place move ("zen").
-static void nudge(int dx) {
+// nudge posts a synthetic mouse-moved event by (dx,dy), then immediately back to
+// the original position so the cursor does not drift. (0,0) posts an in-place
+// move ("zen").
+static void nudge(int dx, int dy) {
     CGEventRef probe = CGEventCreate(NULL);
     CGPoint p = CGEventGetLocation(probe);
     CFRelease(probe);
 
-    if (dx != 0) {
-        CGPoint moved = CGPointMake(p.x + dx, p.y);
+    if (dx != 0 || dy != 0) {
+        CGPoint moved = CGPointMake(p.x + dx, p.y + dy);
         CGEventRef e1 = CGEventCreateMouseEvent(NULL, kCGEventMouseMoved, moved, kCGMouseButtonLeft);
         CGEventPost(kCGHIDEventTap, e1);
         CFRelease(e1);
@@ -75,6 +75,7 @@ const inputSupported = true
 type darwinInput struct {
 	method       config.InputMethod
 	preventSleep bool
+	movePx       int
 
 	mu          sync.Mutex
 	assertionID C.IOPMAssertionID
@@ -82,7 +83,7 @@ type darwinInput struct {
 }
 
 func newInputActivator(cfg config.InputConfig) (Activator, error) {
-	return &darwinInput{method: cfg.Method, preventSleep: cfg.PreventSleep}, nil
+	return &darwinInput{method: cfg.Method, preventSleep: cfg.PreventSleep, movePx: cfg.MovePixels}, nil
 }
 
 func (d *darwinInput) Name() string { return "input(macos:cgevent)" }
@@ -102,9 +103,14 @@ func (d *darwinInput) Tick(_ context.Context) error {
 	case config.MethodKey:
 		C.pressF15()
 	case config.MethodZen:
-		C.nudge(0)
-	default: // MethodMouse — varied small offset for natural movement
-		C.nudge(C.int(naturalDelta()))
+		C.nudge(0, 0)
+	default: // MethodMouse — varied small offset, random axis, for natural movement
+		off := C.int(naturalDelta(d.movePx))
+		if naturalVertical() {
+			C.nudge(0, off)
+		} else {
+			C.nudge(off, 0)
+		}
 	}
 	return nil
 }

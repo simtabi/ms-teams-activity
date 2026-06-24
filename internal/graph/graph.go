@@ -111,6 +111,40 @@ func (c *Client) token(ctx context.Context) (string, error) {
 	return res.AccessToken, nil
 }
 
+// GetPresence reads the signed-in user's current presence. It doubles as a
+// permission check: a 403 indicates Presence.ReadWrite is not admin-consented.
+func (c *Client) GetPresence(ctx context.Context) (availability, activity string, err error) {
+	tok, err := c.token(ctx)
+	if err != nil {
+		return "", "", err
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, graphBase+"/me/presence", nil)
+	if err != nil {
+		return "", "", err
+	}
+	req.Header.Set("Authorization", "Bearer "+tok)
+	resp, err := c.http.Do(req)
+	if err != nil {
+		return "", "", err
+	}
+	defer func() { _ = resp.Body.Close() }()
+	if resp.StatusCode == http.StatusForbidden {
+		return "", "", fmt.Errorf("graph: 403 Forbidden reading presence — Presence.ReadWrite likely lacks admin consent for your tenant")
+	}
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		body, _ := io.ReadAll(io.LimitReader(resp.Body, 1024))
+		return "", "", fmt.Errorf("graph: GET /me/presence returned %s: %s", resp.Status, string(body))
+	}
+	var out struct {
+		Availability string `json:"availability"`
+		Activity     string `json:"activity"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&out); err != nil {
+		return "", "", err
+	}
+	return out.Availability, out.Activity, nil
+}
+
 // SetPreferredPresence sets a sticky preferred presence for the signed-in user.
 func (c *Client) SetPreferredPresence(ctx context.Context, availability, activity, expiration string) error {
 	body := map[string]string{

@@ -2,12 +2,15 @@ package activity
 
 import "math/rand"
 
-// naturalDelta returns a small, non-zero pixel offset (magnitude 1–3) in a
+// naturalDelta returns a small, non-zero pixel offset (magnitude 1..maxPx) in a
 // random direction. Using a varied offset each tick produces less mechanical,
 // more natural cursor movement than a fixed step. The activator moves by this
 // delta and immediately back, so the cursor does not drift.
-func naturalDelta() int {
-	d := 1 + rand.Intn(3) // 1..3
+func naturalDelta(maxPx int) int {
+	if maxPx < 1 {
+		maxPx = 1
+	}
+	d := 1 + rand.Intn(maxPx)
 	if rand.Intn(2) == 0 {
 		return -d
 	}

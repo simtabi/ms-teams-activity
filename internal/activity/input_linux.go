@@ -19,16 +19,17 @@ const inputSupported = true
 // tiny relative mouse move (the most reliable real event); prevent_sleep is a
 // no-op because real input already defers the screensaver.
 type linuxInput struct {
-	mu    sync.Mutex
-	mouse uinput.Mouse
+	mu     sync.Mutex
+	mouse  uinput.Mouse
+	movePx int
 }
 
-func newInputActivator(_ config.InputConfig) (Activator, error) {
+func newInputActivator(cfg config.InputConfig) (Activator, error) {
 	mouse, err := uinput.CreateMouse("/dev/uinput", []byte("mta-virtual-mouse"))
 	if err != nil {
 		return nil, fmt.Errorf("create uinput virtual mouse (is /dev/uinput present and writable? add your user to a uinput group): %w", err)
 	}
-	return &linuxInput{mouse: mouse}, nil
+	return &linuxInput{mouse: mouse, movePx: cfg.MovePixels}, nil
 }
 
 func (l *linuxInput) Name() string { return "input(linux:uinput)" }
@@ -36,7 +37,7 @@ func (l *linuxInput) Name() string { return "input(linux:uinput)" }
 func (l *linuxInput) Tick(_ context.Context) error {
 	l.mu.Lock()
 	defer l.mu.Unlock()
-	n := int32(abs(naturalDelta())) // varied magnitude 1..3
+	n := int32(abs(naturalDelta(l.movePx))) // varied magnitude 1..move_pixels
 	if naturalVertical() {
 		if err := l.mouse.MoveUp(n); err != nil {
 			return err

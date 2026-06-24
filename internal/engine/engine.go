@@ -9,7 +9,6 @@ import (
 	"math/rand"
 	"os"
 	"path/filepath"
-	"sync"
 	"time"
 
 	"github.com/fsnotify/fsnotify"
@@ -38,18 +37,19 @@ type Engine struct {
 	lastTick   *time.Time
 	lastErr    string
 	startedAt  time.Time
-
-	mu sync.Mutex
+	dryRun     bool
 }
 
 // New constructs an Engine. configPath, runtimeDir and tokenPath are resolved by
-// the caller from the chosen scope.
-func New(scope config.Scope, configPath, runtimeDir, tokenPath string, log *slog.Logger) *Engine {
+// the caller from the chosen scope. When dryRun is true the engine logs intended
+// actions instead of injecting input or calling Graph.
+func New(scope config.Scope, configPath, runtimeDir, tokenPath string, dryRun bool, log *slog.Logger) *Engine {
 	return &Engine{
 		scope:      scope,
 		configPath: configPath,
 		runtimeDir: runtimeDir,
 		tokenPath:  tokenPath,
+		dryRun:     dryRun,
 		log:        log,
 		startedAt:  time.Now(),
 	}
@@ -220,6 +220,10 @@ func (e *Engine) reloadConfig(ctx context.Context) {
 
 // rebuild constructs the activator set for the current config.
 func (e *Engine) rebuild(_ context.Context) error {
+	if e.dryRun {
+		e.activators = []activity.Activator{activity.NewDry(string(e.cfg.Engine), e.log)}
+		return nil
+	}
 	var as []activity.Activator
 	if e.cfg.UsesInput() {
 		a, err := activity.NewInput(e.cfg.Input)

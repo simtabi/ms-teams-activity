@@ -8,6 +8,7 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/simtabi/ms-teams-activity/internal/activity"
 	"github.com/simtabi/ms-teams-activity/internal/config"
@@ -139,7 +140,15 @@ func checkGraph(cfg config.Config, cfgErr error, add func(checkLevel, string, st
 		add(levelWarn, "graph", "not signed in — run `mta auth login` (needs admin-consented Presence.ReadWrite)")
 		return
 	}
-	add(levelOK, "graph", "signed in as "+acct)
+	// Live read verifies the token works and the permission is consented.
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	avail, act, err := c.GetPresence(ctx)
+	if err != nil {
+		add(levelFail, "graph", err.Error())
+		return
+	}
+	add(levelOK, "graph", fmt.Sprintf("signed in as %s; presence %s/%s", acct, avail, act))
 }
 
 func checkScope(cfg config.Config, cfgErr error, add func(checkLevel, string, string)) {

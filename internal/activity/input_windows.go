@@ -71,13 +71,14 @@ type rawKeybdInput struct {
 type windowsInput struct {
 	method       config.InputMethod
 	preventSleep bool
+	movePx       int
 
 	mu   sync.Mutex
 	held bool
 }
 
 func newInputActivator(cfg config.InputConfig) (Activator, error) {
-	return &windowsInput{method: cfg.Method, preventSleep: cfg.PreventSleep}, nil
+	return &windowsInput{method: cfg.Method, preventSleep: cfg.PreventSleep, movePx: cfg.MovePixels}, nil
 }
 
 func (w *windowsInput) Name() string { return "input(windows:sendinput)" }
@@ -97,7 +98,7 @@ func (w *windowsInput) Tick(_ context.Context) error {
 	case config.MethodZen:
 		return sendMouseMove(0, 0)
 	default: // MethodMouse — a real, varied small move that returns to origin.
-		d := int32(naturalDelta())
+		d := int32(naturalDelta(w.movePx))
 		dx, dy := d, int32(0)
 		if naturalVertical() {
 			dx, dy = 0, d

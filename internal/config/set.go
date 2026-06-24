@@ -48,6 +48,10 @@ var registry = map[string]field{
 		func(c Config) string { return strconv.FormatBool(c.Input.PreventSleep) },
 		func(c *Config, v string) error { return setBool(&c.Input.PreventSleep, v) },
 	},
+	"input.move_pixels": {
+		func(c Config) string { return strconv.Itoa(c.Input.MovePixels) },
+		func(c *Config, v string) error { return setInt(&c.Input.MovePixels, v) },
+	},
 	"graph.tenant_id": {
 		func(c Config) string { return c.Graph.TenantID },
 		func(c *Config, v string) error { c.Graph.TenantID = v; return nil },

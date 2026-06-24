@@ -11,9 +11,10 @@ import (
 )
 
 var (
-	flagScope  string
-	flagConfig string
-	flagJSON   bool
+	flagScope   string
+	flagConfig  string
+	flagJSON    bool
+	flagVerbose bool
 )
 
 var rootCmd = &cobra.Command{
@@ -47,6 +48,7 @@ func init() {
 	pf.StringVar(&flagScope, "scope", "user", "config/runtime scope: user|system")
 	pf.StringVar(&flagConfig, "config", "", "path to config.json (overrides scope default)")
 	pf.BoolVar(&flagJSON, "json", false, "emit machine-readable JSON where supported")
+	pf.BoolVar(&flagVerbose, "verbose", false, "verbose (debug) logging")
 }
 
 // scope resolves the --scope flag into a config.Scope, defaulting to user.
