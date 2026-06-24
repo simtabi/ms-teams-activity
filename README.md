@@ -45,6 +45,8 @@ Pick whichever fits (full details in [docs/installation.md](docs/installation.md
 ```bash
 # Script (macOS/Linux) — downloads + checksum-verifies the prebuilt binary
 curl -fsSL https://raw.githubusercontent.com/simtabi/ms-teams-activity/main/scripts/install.sh | sh
+# …or in one shot, also configure + install + start the background daemon:
+curl -fsSL https://raw.githubusercontent.com/simtabi/ms-teams-activity/main/scripts/install.sh | sh -s -- --with-service
 
 # Homebrew (macOS/Linux)
 brew install simtabi/tap/mta
@@ -90,6 +92,23 @@ mta upgrade --check    # just report whether an update is available
 `mta upgrade` only manages standalone installs; if you installed via Homebrew,
 Scoop, or a system package it tells you to use that manager instead. See
 [docs/updating.md](docs/updating.md).
+
+## The daemon
+
+```bash
+mta install --init     # turnkey: write a default config if needed, install + start the service
+mta status             # service + daemon state
+mta restart            # restart after config changes (config is also hot-reloaded)
+mta stop / mta start
+mta uninstall          # stop + remove the service (keeps the binary)
+```
+
+Remove everything (service + binary, `--purge` also deletes config/data):
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/simtabi/ms-teams-activity/main/scripts/uninstall.sh | sh
+# or: mta self uninstall --purge
+```
 
 ## Documentation
 

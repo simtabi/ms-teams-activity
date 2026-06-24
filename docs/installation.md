@@ -49,10 +49,34 @@ removes the service and the binary (and, with `--purge`, config + data).
 ## First run
 
 ```bash
-mta config init     # writes the default config for the chosen --scope
+mta config wizard   # guided setup (or: mta config init for defaults)
 mta doctor          # verify capabilities and permissions
 mta install         # install + start the background service
 mta status          # check service + daemon state
+```
+
+## Daemon lifecycle
+
+The background service is managed with these commands (they auto-select the
+right per-OS mechanism — launchd / systemd / Windows service / Windows logon
+task):
+
+```bash
+mta install --init   # turnkey: write a default config if missing, then install + start
+mta start | stop | restart | status
+mta uninstall        # stop + remove the service (keeps the binary)
+```
+
+The install scripts can do the whole thing in one shot with `--with-service`
+(`-WithService` on Windows). To remove everything later:
+
+```bash
+# macOS/Linux  (append `-s -- --purge` to also delete config + runtime data)
+curl -fsSL https://raw.githubusercontent.com/simtabi/ms-teams-activity/main/scripts/uninstall.sh | sh
+# Windows
+irm https://raw.githubusercontent.com/simtabi/ms-teams-activity/main/scripts/uninstall.ps1 | iex
+# or, directly:
+mta self uninstall --purge
 ```
 
 ## Scope: user vs system

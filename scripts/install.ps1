@@ -3,8 +3,12 @@
 #
 #   irm https://raw.githubusercontent.com/simtabi/ms-teams-activity/main/scripts/install.ps1 | iex
 #   ./scripts/install.ps1 -Prefix C:\Tools
+#   ./scripts/install.ps1 -WithService   # also configure + install + start the daemon
 
-param([string]$Prefix = "$env:LOCALAPPDATA\Programs\mta")
+param(
+    [string]$Prefix = "$env:LOCALAPPDATA\Programs\mta",
+    [switch]$WithService
+)
 
 $ErrorActionPreference = "Stop"
 $repo = "simtabi/ms-teams-activity"
@@ -48,8 +52,19 @@ if ($userPath -notlike "*$Prefix*") {
     Write-Host "Added $Prefix to your user PATH (restart your terminal)."
 }
 
-Write-Host ""
-Write-Host "Next steps:"
-Write-Host "  mta config wizard    # guided setup (or: mta config init)"
-Write-Host "  mta doctor           # check capabilities"
-Write-Host "  mta install          # install + start the logon task / service"
+$mta = Join-Path $Prefix "mta.exe"
+if ($WithService) {
+    Write-Host "Setting up the background service..."
+    & $mta install --init
+    Write-Host "Done. Manage it with: mta status / mta restart / mta stop"
+}
+else {
+    Write-Host ""
+    Write-Host "Next steps:"
+    Write-Host "  mta config wizard    # guided setup (or: mta config init)"
+    Write-Host "  mta doctor           # check capabilities"
+    Write-Host "  mta install          # install + start the logon task / service"
+    Write-Host "                       # (or re-run this installer with -WithService)"
+    Write-Host ""
+    Write-Host "Uninstall later:  irm https://raw.githubusercontent.com/$repo/main/scripts/uninstall.ps1 | iex"
+}

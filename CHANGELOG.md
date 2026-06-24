@@ -6,6 +6,22 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.2.3] - 2026-06-24
+
+### Added
+- Turnkey daemon setup: `mta install --init` writes a default config first if
+  none exists; the install scripts gain `--with-service` (`-WithService` on
+  Windows) to configure + install + start the service in one step; new
+  `scripts/uninstall.sh` / `scripts/uninstall.ps1` for a clean removal (service +
+  binary, `--purge` also wipes config/data).
+
+### Changed
+- `scripts/build-all.sh` now always cleans `dist/` before building, so stale or
+  renamed artifacts never linger.
+- `start`/`stop`/`restart` give a clearer "is the service installed? run
+  `mta install`" hint on failure; `install` is idempotent (restarts if the
+  service already exists).
+
 ## [0.2.2] - 2026-06-24
 
 ### Added
@@ -111,7 +127,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   `doctor`, `version`) and a Bubble Tea TUI dashboard.
 - `doctor` diagnostics for permissions, capabilities, and configuration.
 
-[Unreleased]: https://github.com/simtabi/ms-teams-activity/compare/v0.2.2...HEAD
+[Unreleased]: https://github.com/simtabi/ms-teams-activity/compare/v0.2.3...HEAD
+[0.2.3]: https://github.com/simtabi/ms-teams-activity/releases/tag/v0.2.3
 [0.2.2]: https://github.com/simtabi/ms-teams-activity/releases/tag/v0.2.2
 [0.2.1]: https://github.com/simtabi/ms-teams-activity/releases/tag/v0.2.1
 [0.2.0]: https://github.com/simtabi/ms-teams-activity/releases/tag/v0.2.0

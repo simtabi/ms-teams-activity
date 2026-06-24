@@ -35,6 +35,9 @@ COMMIT="$(git rev-parse --short HEAD 2>/dev/null || echo none)"
 P=github.com/simtabi/ms-teams-activity/internal/cli
 LDFLAGS="-s -w -X ${P}.version=${VERSION} -X ${P}.date=${DATE} -X ${P}.commit=${COMMIT}"
 host_os="$(go env GOOS)"; host_arch="$(go env GOARCH)"
+
+# Always start from a clean slate so stale/renamed artifacts never linger.
+rm -rf dist out
 mkdir -p dist/archives
 
 # os_label maps a GOOS to the human-friendly OS token used in artifact names.

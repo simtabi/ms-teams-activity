@@ -3,12 +3,21 @@
 # verifying its SHA-256. Falls back to building from source if Go is present.
 #
 #   curl -fsSL https://raw.githubusercontent.com/simtabi/ms-teams-activity/main/scripts/install.sh | sh
-#   ./scripts/install.sh            # to ~/.local/bin
-#   sudo ./scripts/install.sh       # to /usr/local/bin
+#   ./scripts/install.sh                  # binary only, to ~/.local/bin
+#   ./scripts/install.sh --with-service   # also configure + install + start the daemon
+#   sudo ./scripts/install.sh             # to /usr/local/bin
 set -eu
 
 REPO="simtabi/ms-teams-activity"
 BASE="https://github.com/${REPO}/releases/latest/download"
+
+WITH_SERVICE="${MTA_WITH_SERVICE:-0}"
+for a in "$@"; do
+  case "$a" in
+    --with-service) WITH_SERVICE=1 ;;
+    *) echo "unknown option: $a" >&2; exit 1 ;;
+  esac
+done
 
 os=$(uname -s | tr '[:upper:]' '[:lower:]')
 arch=$(uname -m)
@@ -55,10 +64,21 @@ else
 fi
 
 case ":$PATH:" in *":$PREFIX:"*) ;; *) echo "note: add $PREFIX to your PATH";; esac
-cat <<'EOF'
+
+if [ "$WITH_SERVICE" = "1" ]; then
+  echo "Setting up the background service..."
+  "${PREFIX}/mta" install --init || echo "service setup failed; run '${PREFIX}/mta' doctor"
+  echo "Done. Manage it with: mta status / mta restart / mta stop"
+else
+  cat <<EOF
 
 Next steps:
-  mta config init      # or `mta config wizard` for guided setup
+  mta config wizard    # guided setup (or: mta config init)
   mta doctor           # check capabilities & permissions
   mta install          # install + start the background service
+                       # (or re-run this installer with --with-service)
+
+Uninstall later:
+  curl -fsSL https://raw.githubusercontent.com/${REPO}/main/scripts/uninstall.sh | sh
 EOF
+fi
