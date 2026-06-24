@@ -108,7 +108,9 @@ done < build/targets.txt
 # macOS universal binary — Apple Silicon + Intel in one file, runs on any Mac.
 if [ -f dist/mta_darwin_arm64 ] && [ -f dist/mta_darwin_amd64 ] && command -v lipo >/dev/null 2>&1; then
   echo ">> mta_darwin_universal  —  macOS Universal (Apple Silicon + Intel)"
-  lipo -create -output dist/mta_darwin_universal dist/mta_darwin_arm64 dist/mta_darwin_amd64
+  # lipo to a temp path then rename, to avoid an occasional in-place temp-file race.
+  lipo -create -output dist/.universal.tmp dist/mta_darwin_arm64 dist/mta_darwin_amd64
+  mv -f dist/.universal.tmp dist/mta_darwin_universal
   tar -C dist -czf dist/mta_darwin_universal.tar.gz mta_darwin_universal
 fi
 
