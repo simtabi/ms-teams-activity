@@ -6,6 +6,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-06-24
+
 ### Added
 - Initial release.
 - Prebuilt release binaries for macOS/Windows/Linux with `checksums.txt`, plus
@@ -45,4 +47,5 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   `doctor`, `version`) and a Bubble Tea TUI dashboard.
 - `doctor` diagnostics for permissions, capabilities, and configuration.
 
-[Unreleased]: https://github.com/simtabi/ms-teams-activity/commits/main
+[Unreleased]: https://github.com/simtabi/ms-teams-activity/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/simtabi/ms-teams-activity/releases/tag/v0.1.0
