@@ -6,6 +6,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+- TUI Override menu offers timed "force active" presets (1h / 2h / 4h) alongside
+  indefinite — parity with the CLI's `on --for`.
+
 ## [0.2.1] - 2026-06-24
 
 ### Changed

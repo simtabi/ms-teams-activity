@@ -264,11 +264,18 @@ func (m model) selectMenu(id menuID) (tea.Model, tea.Cmd) {
 
 // ---- Override submenu ----
 
-var overrideItems = []struct{ key, label, desc string }{
-	{"on", "Force active", "Stay Available now, ignoring the schedule"},
-	{"off", "Force inactive", "Stop keeping active now"},
-	{"resume", "Resume schedule", "Clear the override and follow the schedule"},
-	{"back", "Back", ""},
+var overrideItems = []struct {
+	key   string
+	dur   time.Duration
+	label string
+}{
+	{"on", 0, "Force active — indefinite"},
+	{"on", time.Hour, "Force active — 1 hour"},
+	{"on", 2 * time.Hour, "Force active — 2 hours"},
+	{"on", 4 * time.Hour, "Force active — 4 hours"},
+	{"off", 0, "Force inactive"},
+	{"resume", 0, "Resume schedule"},
+	{"back", 0, "Back"},
 }
 
 func (m model) updateOverride(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
@@ -280,11 +287,12 @@ func (m model) updateOverride(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	case "down", "j":
 		m.subCursor = moveCursor(m.subCursor, len(overrideItems), +1)
 	case "enter", "right", "l":
-		switch overrideItems[m.subCursor].key {
+		it := overrideItems[m.subCursor]
+		switch it.key {
 		case "on":
-			m.setOverride(schedule.OverrideOn)
+			m.setOverride(schedule.OverrideOn, it.dur)
 		case "off":
-			m.setOverride(schedule.OverrideOff)
+			m.setOverride(schedule.OverrideOff, it.dur)
 		case "resume":
 			if err := os.Remove(control.OverridePath(m.opts.RuntimeDir)); err != nil && !os.IsNotExist(err) {
 				m.flash = "resume failed: " + err.Error()
@@ -298,13 +306,22 @@ func (m model) updateOverride(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
-func (m *model) setOverride(mode schedule.OverrideMode) {
+// setOverride writes a manual override. A dur > 0 sets an expiry.
+func (m *model) setOverride(mode schedule.OverrideMode, dur time.Duration) {
 	ov := schedule.Override{Mode: mode, SetAt: time.Now()}
+	if dur > 0 {
+		u := time.Now().Add(dur)
+		ov.Until = &u
+	}
 	if err := schedule.SaveOverride(control.OverridePath(m.opts.RuntimeDir), ov); err != nil {
 		m.flash = "override failed: " + err.Error()
 		return
 	}
-	m.flash = "override set: " + string(mode)
+	if ov.Until != nil {
+		m.flash = "override " + string(mode) + " until " + ov.Until.Format("Mon 15:04")
+	} else {
+		m.flash = "override " + string(mode)
+	}
 	m.refresh()
 }
 
@@ -485,9 +502,6 @@ func overrideItemsLabels() []string {
 	out := make([]string, len(overrideItems))
 	for i, it := range overrideItems {
 		out[i] = it.label
-		if it.desc != "" {
-			out[i] += "  " + helpStyle.Render(it.desc)
-		}
 	}
 	return out
 }

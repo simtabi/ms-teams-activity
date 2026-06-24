@@ -3,6 +3,7 @@ package tui
 import (
 	"path/filepath"
 	"testing"
+	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/simtabi/ms-teams-activity/internal/config"
@@ -187,38 +188,59 @@ func TestEscReturnsToMenu(t *testing.T) {
 
 // --- override ---
 
+func overrideIndex(key string, dur time.Duration) int {
+	for i, it := range overrideItems {
+		if it.key == key && it.dur == dur {
+			return i
+		}
+	}
+	return -1
+}
+
 func TestOverrideActions(t *testing.T) {
 	m := newModel(testOpts(t, true))
 	ovrPath := control.OverridePath(m.opts.RuntimeDir)
 
-	// Force active.
-	m.screen = screenOverride
-	m.subCursor = 0 // "on"
-	m = press(m, "enter")
-	if m.screen != screenMenu {
-		t.Fatal("override action should return to menu")
-	}
-	ov, _ := schedule.LoadOverride(ovrPath)
-	if ov.Mode != schedule.OverrideOn {
-		t.Fatalf("expected override on, got %q", ov.Mode)
+	pick := func(idx int) schedule.Override {
+		m.screen = screenOverride
+		m.subCursor = idx
+		m = press(m, "enter")
+		if m.screen != screenMenu {
+			t.Fatalf("override action should return to menu")
+		}
+		ov, _ := schedule.LoadOverride(ovrPath)
+		return ov
 	}
 
-	// Force inactive.
-	m.screen = screenOverride
-	m.subCursor = 1 // "off"
-	m = press(m, "enter")
-	ov, _ = schedule.LoadOverride(ovrPath)
-	if ov.Mode != schedule.OverrideOff {
+	if ov := pick(overrideIndex("on", 0)); ov.Mode != schedule.OverrideOn || ov.Until != nil {
+		t.Fatalf("indefinite on: got mode=%q until=%v", ov.Mode, ov.Until)
+	}
+	if ov := pick(overrideIndex("off", 0)); ov.Mode != schedule.OverrideOff {
 		t.Fatalf("expected override off, got %q", ov.Mode)
 	}
-
-	// Resume clears it.
-	m.screen = screenOverride
-	m.subCursor = 2 // "resume"
-	m = press(m, "enter")
-	ov, _ = schedule.LoadOverride(ovrPath)
-	if ov.Mode != schedule.OverrideNone {
+	if ov := pick(overrideIndex("resume", 0)); ov.Mode != schedule.OverrideNone {
 		t.Fatalf("expected override cleared, got %q", ov.Mode)
+	}
+}
+
+func TestOverrideTimed(t *testing.T) {
+	m := newModel(testOpts(t, true))
+	ovrPath := control.OverridePath(m.opts.RuntimeDir)
+	idx := overrideIndex("on", 2*time.Hour)
+	if idx < 0 {
+		t.Fatal("expected a 2-hour override preset")
+	}
+	m.screen = screenOverride
+	m.subCursor = idx
+	before := time.Now()
+	m = press(m, "enter")
+	ov, _ := schedule.LoadOverride(ovrPath)
+	if ov.Mode != schedule.OverrideOn || ov.Until == nil {
+		t.Fatalf("timed override should set mode on + Until; got mode=%q until=%v", ov.Mode, ov.Until)
+	}
+	lo, hi := before.Add(2*time.Hour-time.Minute), time.Now().Add(2*time.Hour+time.Minute)
+	if ov.Until.Before(lo) || ov.Until.After(hi) {
+		t.Fatalf("Until %v not ~2h out", ov.Until)
 	}
 }
 
