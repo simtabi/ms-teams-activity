@@ -1,29 +1,35 @@
-// Package tui implements the interactive terminal dashboard for mta: live
-// status, manual override controls and a tail of the daemon log.
+// Package tui implements the interactive terminal hub for mta: live status,
+// manual overrides, schedule editor, settings editor, service/auth/update
+// actions, and first-run onboarding.
 package tui
 
 import (
 	"bufio"
+	"context"
 	"fmt"
 	"os"
+	"os/exec"
 	"strings"
 	"time"
 
+	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/simtabi/ms-teams-activity/internal/config"
 	"github.com/simtabi/ms-teams-activity/internal/control"
 	"github.com/simtabi/ms-teams-activity/internal/schedule"
+	"github.com/simtabi/ms-teams-activity/internal/selfupdate"
 )
 
-// Options configures the TUI with the resolved paths for the active scope.
+// Options configures the TUI with resolved paths for the active scope.
 type Options struct {
 	Scope      config.Scope
 	ConfigPath string
 	RuntimeDir string
+	Version    string
 }
 
-// Run starts the Bubble Tea program and blocks until the user quits.
+// Run starts the dashboard hub.
 func Run(opts Options) error {
 	p := tea.NewProgram(newModel(opts), tea.WithAltScreen())
 	_, err := p.Run()
@@ -31,16 +37,22 @@ func Run(opts Options) error {
 }
 
 type tickMsg time.Time
+type updateMsg struct{ info selfupdate.Info }
 
 type viewMode int
 
 const (
 	modeDashboard viewMode = iota
 	modeEditor
+	modeSettings
+	modeService
+	modeHelp
+	modeOnboard
 )
 
 type model struct {
 	opts   Options
+	exe    string
 	status control.Status
 	stErr  error
 	cfg    config.Config
@@ -49,60 +61,128 @@ type model struct {
 	flash  string
 	width  int
 	height int
-
-	// Editor state (active when mode == modeEditor).
 	mode   viewMode
-	edit   config.Config // working copy being edited
-	winIdx int           // selected schedule window
-	field  int           // selected field: 0=days 1=start 2=end
+	update selfupdate.Info
+
+	// Schedule editor state.
+	edit   config.Config
+	winIdx int
+	field  int
+
+	// Settings editor state.
+	setRow     int
+	setInput   textinput.Model
+	setEditing bool
+
+	// Service menu state.
+	svcRow int
 }
 
 func newModel(opts Options) model {
-	m := model{opts: opts}
+	exe, _ := os.Executable()
+	ti := textinput.New()
+	ti.CharLimit = 128
+	m := model{opts: opts, exe: exe, setInput: ti}
 	m.refresh()
+	if m.cfgErr != nil {
+		m.mode = modeOnboard
+	}
 	return m
 }
 
-func (m model) Init() tea.Cmd { return tick() }
+func (m model) Init() tea.Cmd {
+	return tea.Batch(tick(), checkUpdateCmd(m.opts.Version))
+}
 
 func tick() tea.Cmd {
 	return tea.Tick(time.Second, func(t time.Time) tea.Msg { return tickMsg(t) })
 }
 
+func checkUpdateCmd(version string) tea.Cmd {
+	return func() tea.Msg {
+		ctx, cancel := context.WithTimeout(context.Background(), 8*time.Second)
+		defer cancel()
+		info, err := selfupdate.Check(ctx, version)
+		if err != nil {
+			return updateMsg{}
+		}
+		return updateMsg{info: info}
+	}
+}
+
 func (m *model) refresh() {
 	m.status, m.stErr = control.ReadStatus(m.opts.RuntimeDir)
 	m.cfg, m.cfgErr = config.Load(m.opts.ConfigPath)
-	m.logs = tailLines(control.LogPath(m.opts.RuntimeDir), 8)
+	m.logs = tailLines(control.LogPath(m.opts.RuntimeDir), 6)
+}
+
+// exec suspends the TUI, runs `mta <args>`, then resumes and refreshes.
+func (m model) execSelf(args ...string) tea.Cmd {
+	c := exec.Command(m.exe, args...)
+	return tea.ExecProcess(c, func(error) tea.Msg { return tickMsg(time.Now()) })
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		m.width, m.height = msg.Width, msg.Height
+	case updateMsg:
+		m.update = msg.info
+		return m, nil
 	case tickMsg:
 		m.refresh()
 		return m, tick()
 	case tea.KeyMsg:
-		if m.mode == modeEditor {
+		switch m.mode {
+		case modeEditor:
 			return m.updateEditor(msg)
+		case modeSettings:
+			return m.updateSettings(msg)
+		case modeService:
+			return m.updateService(msg)
+		case modeOnboard:
+			return m.updateOnboard(msg)
+		case modeHelp:
+			m.mode = modeDashboard
+			return m, nil
+		default:
+			return m.updateDashboard(msg)
 		}
-		switch msg.String() {
-		case "q", "ctrl+c":
-			return m, tea.Quit
-		case "o":
-			m.setOverride(schedule.OverrideOn)
-		case "f":
-			m.setOverride(schedule.OverrideOff)
-		case "r":
-			if err := os.Remove(control.OverridePath(m.opts.RuntimeDir)); err != nil && !os.IsNotExist(err) {
-				m.flash = "resume failed: " + err.Error()
-			} else {
-				m.flash = "override cleared"
-			}
-			m.refresh()
-		case "e":
-			m.enterEditor()
+	}
+	return m, nil
+}
+
+func (m model) updateDashboard(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
+	switch msg.String() {
+	case "q", "ctrl+c":
+		return m, tea.Quit
+	case "o":
+		m.setOverride(schedule.OverrideOn)
+	case "f":
+		m.setOverride(schedule.OverrideOff)
+	case "r":
+		if err := os.Remove(control.OverridePath(m.opts.RuntimeDir)); err != nil && !os.IsNotExist(err) {
+			m.flash = "resume failed: " + err.Error()
+		} else {
+			m.flash = "override cleared"
 		}
+		m.refresh()
+	case "e":
+		m.enterEditor()
+	case "c":
+		m.enterSettings()
+	case "v":
+		m.mode = modeService
+		m.svcRow = 0
+	case "a":
+		return m, m.execSelf("auth", "login")
+	case "u":
+		if m.update.Available {
+			return m, m.execSelf("upgrade", "--yes")
+		}
+		m.flash = "no update available"
+	case "?":
+		m.mode = modeHelp
 	}
 	return m, nil
 }
@@ -117,6 +197,24 @@ func (m *model) setOverride(mode schedule.OverrideMode) {
 	m.refresh()
 }
 
+func (m model) updateOnboard(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
+	switch msg.String() {
+	case "q", "ctrl+c":
+		return m, tea.Quit
+	case "i":
+		if err := config.Default().Save(m.opts.ConfigPath); err != nil {
+			m.flash = "init failed: " + err.Error()
+			return m, nil
+		}
+		m.refresh()
+		m.mode = modeDashboard
+		m.flash = "wrote default config"
+	case "w":
+		return m, m.execSelf("config", "wizard")
+	}
+	return m, nil
+}
+
 var (
 	titleStyle  = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("63"))
 	boxStyle    = lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).Padding(0, 1).Margin(0, 0, 1, 0)
@@ -125,23 +223,70 @@ var (
 	idleStyle   = lipgloss.NewStyle().Foreground(lipgloss.Color("208"))
 	helpStyle   = lipgloss.NewStyle().Foreground(lipgloss.Color("240"))
 	flashStyle  = lipgloss.NewStyle().Foreground(lipgloss.Color("220"))
+	bannerStyle = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("0")).Background(lipgloss.Color("42")).Padding(0, 1)
 )
 
 func (m model) View() string {
-	if m.mode == modeEditor {
+	switch m.mode {
+	case modeEditor:
 		return m.editorView()
+	case modeSettings:
+		return m.settingsView()
+	case modeService:
+		return m.serviceView()
+	case modeHelp:
+		return m.helpView()
+	case modeOnboard:
+		return m.onboardView()
+	default:
+		return m.dashboardView()
 	}
-	var b strings.Builder
-	b.WriteString(titleStyle.Render("  MS Teams Activity") + "  " + helpStyle.Render("scope="+string(m.opts.Scope)) + "\n\n")
+}
 
+func (m model) dashboardView() string {
+	var b strings.Builder
+	b.WriteString(titleStyle.Render("  MS Teams Activity") + "  " + helpStyle.Render("scope="+string(m.opts.Scope)+"  v"+m.opts.Version) + "\n\n")
+	if m.update.Available {
+		b.WriteString(bannerStyle.Render(fmt.Sprintf("update available: %s → %s  (press u)", m.update.Current, m.update.Latest)) + "\n\n")
+	}
 	b.WriteString(boxStyle.Render(m.statusView()) + "\n")
 	b.WriteString(boxStyle.Render(m.scheduleView()) + "\n")
 	b.WriteString(boxStyle.Render(m.logView()) + "\n")
-
 	if m.flash != "" {
 		b.WriteString(flashStyle.Render("• "+m.flash) + "\n")
 	}
-	b.WriteString(helpStyle.Render("[o] force on   [f] force off   [r] resume   [e] edit schedule   [q] quit"))
+	b.WriteString(helpStyle.Render("[o]n [f]off [r]esume  [e]schedule [c]onfig [v]service [a]uth [u]pdate  [?]help [q]uit"))
+	return b.String()
+}
+
+func (m model) onboardView() string {
+	var b strings.Builder
+	b.WriteString(titleStyle.Render("  MS Teams Activity — first run") + "\n\n")
+	b.WriteString(boxStyle.Render("No config found at:\n  "+m.opts.ConfigPath+"\n\nLet's set it up.") + "\n")
+	if m.flash != "" {
+		b.WriteString(flashStyle.Render("• "+m.flash) + "\n")
+	}
+	b.WriteString(helpStyle.Render("[w] guided setup wizard   [i] write defaults   [q] quit"))
+	return b.String()
+}
+
+func (m model) helpView() string {
+	var b strings.Builder
+	b.WriteString(titleStyle.Render("  Help") + "\n\n")
+	body := strings.Join([]string{
+		"Dashboard:",
+		"  o / f / r   override on / off / resume schedule",
+		"  e           edit schedule windows",
+		"  c           edit settings (engine, interval, graph, ...)",
+		"  v           service actions (install/start/stop/...)",
+		"  a           sign in to Microsoft Graph",
+		"  u           install available update",
+		"  q           quit",
+		"",
+		"Everything here is also available as CLI commands (see `mta --help`).",
+	}, "\n")
+	b.WriteString(boxStyle.Render(body) + "\n")
+	b.WriteString(helpStyle.Render("press any key to return"))
 	return b.String()
 }
 
@@ -194,7 +339,6 @@ func (m model) scheduleView() string {
 	for _, w := range m.cfg.Schedule.Windows {
 		lines = append(lines, "  "+strings.Join(w.Days, " ")+"  "+w.Start+"–"+w.End)
 	}
-	lines = append(lines, helpStyle.Render("  edit with: mta config edit"))
 	return strings.Join(lines, "\n")
 }
 

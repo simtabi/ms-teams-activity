@@ -11,16 +11,32 @@ var tuiCmd = &cobra.Command{
 	RunE:  func(_ *cobra.Command, _ []string) error { return runTUI() },
 }
 
-func runTUI() error {
+func tuiOptions() (tui.Options, error) {
 	cfgPath, err := configPath()
 	if err != nil {
-		return err
+		return tui.Options{}, err
 	}
 	rt, err := runtimeDir()
 	if err != nil {
+		return tui.Options{}, err
+	}
+	return tui.Options{Scope: scope(), ConfigPath: cfgPath, RuntimeDir: rt, Version: version}, nil
+}
+
+func runTUI() error {
+	opts, err := tuiOptions()
+	if err != nil {
 		return err
 	}
-	return tui.Run(tui.Options{Scope: scope(), ConfigPath: cfgPath, RuntimeDir: rt})
+	return tui.Run(opts)
+}
+
+func runWizard() error {
+	opts, err := tuiOptions()
+	if err != nil {
+		return err
+	}
+	return tui.RunWizard(opts)
 }
 
 func init() {

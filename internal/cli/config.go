@@ -110,8 +110,73 @@ var configEditCmd = &cobra.Command{
 	},
 }
 
+var configGetCmd = &cobra.Command{
+	Use:   "get <key>",
+	Short: "Print a single config value (dotted key, e.g. input.interval_seconds)",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(_ *cobra.Command, args []string) error {
+		c, err := loadConfig()
+		if err != nil {
+			return err
+		}
+		v, err := c.GetField(args[0])
+		if err != nil {
+			return err
+		}
+		fmt.Println(v)
+		return nil
+	},
+}
+
+var configSetCmd = &cobra.Command{
+	Use:   "set <key> <value>",
+	Short: "Set a config value (validated) and save",
+	Args:  cobra.ExactArgs(2),
+	RunE: func(_ *cobra.Command, args []string) error {
+		p, err := configPath()
+		if err != nil {
+			return err
+		}
+		c, err := loadConfig()
+		if err != nil {
+			return err
+		}
+		if err := c.SetField(args[0], args[1]); err != nil {
+			return err
+		}
+		if err := c.Save(p); err != nil {
+			return err
+		}
+		fmt.Printf("%s = %s\n", args[0], args[1])
+		return nil
+	},
+}
+
+var configKeysCmd = &cobra.Command{
+	Use:   "keys",
+	Short: "List settable config keys",
+	RunE: func(_ *cobra.Command, _ []string) error {
+		if flagJSON {
+			return printJSON(config.SettableKeys())
+		}
+		for _, k := range config.SettableKeys() {
+			fmt.Println(k)
+		}
+		return nil
+	},
+}
+
+var configWizardCmd = &cobra.Command{
+	Use:   "wizard",
+	Short: "Guided interactive setup",
+	RunE:  func(_ *cobra.Command, _ []string) error { return runWizard() },
+}
+
 func init() {
 	configInitCmd.Flags().BoolVar(&flagForce, "force", false, "overwrite an existing config")
-	configCmd.AddCommand(configInitCmd, configPathCmd, configValidateCmd, configShowCmd, configEditCmd)
+	configCmd.AddCommand(
+		configInitCmd, configPathCmd, configValidateCmd, configShowCmd, configEditCmd,
+		configGetCmd, configSetCmd, configKeysCmd, configWizardCmd,
+	)
 	rootCmd.AddCommand(configCmd)
 }
