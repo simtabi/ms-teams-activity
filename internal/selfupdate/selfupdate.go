@@ -8,6 +8,7 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 
 	"github.com/creativeprojects/go-selfupdate"
@@ -37,12 +38,15 @@ func IsDev(v string) bool {
 func repository() selfupdate.Repository { return selfupdate.ParseSlug(Slug) }
 
 func newUpdater() (*selfupdate.Updater, error) {
-	return selfupdate.NewUpdater(selfupdate.Config{
+	cfg := selfupdate.Config{
 		Validator: &selfupdate.ChecksumValidator{UniqueFilename: "checksums.txt"},
-		// On macOS, fall back to the universal (fat) binary when a per-arch
-		// asset isn't found — i.e. mta_darwin_universal.tar.gz.
-		UniversalArch: "universal",
-	})
+	}
+	// Assets use the friendly "macos" OS token (not Go's "darwin"), so tell the
+	// updater to match macos_<arch> assets when running on a Mac.
+	if runtime.GOOS == "darwin" {
+		cfg.OS = "macos"
+	}
+	return selfupdate.NewUpdater(cfg)
 }
 
 // Check reports whether a newer release exists. It does not modify anything.

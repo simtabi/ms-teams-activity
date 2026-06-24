@@ -31,12 +31,17 @@ mta schedule clear
 
 | Scope | Config | Runtime (status/override/log/token) |
 |-------|--------|-------------------------------------|
-| user | `os.UserConfigDir()/ms-teams-activity/config.json` | `os.UserCacheDir()/ms-teams-activity/` |
+| user (Linux/macOS) | `~/.config/ms-teams-activity/config.json` (`$XDG_CONFIG_HOME`) | `~/.local/state/ms-teams-activity/` (`$XDG_STATE_HOME`) |
+| user (Windows) | `%AppData%\ms-teams-activity\config.json` | `%LocalAppData%\ms-teams-activity\` |
 | system (Linux) | `/etc/ms-teams-activity/config.json` | `/etc/ms-teams-activity/` |
 | system (macOS) | `/Library/Application Support/ms-teams-activity/` | same |
 | system (Windows) | `C:\ProgramData\ms-teams-activity\` | same |
 
-> Multi-user note: with `--scope user`, runtime files live under your own cache
+> macOS deliberately uses `~/.config` / `~/.local/state` (not
+> `~/Library/Application Support`) so the locations are predictable across
+> platforms and easy to find.
+
+> Multi-user note: with `--scope user`, runtime files live under your own state
 > dir so the CLI can always write the override file the daemon watches. For a
 > `--scope system` graph daemon, runtime files are root-owned; control commands
 > then require matching privilege (or enable the optional loopback API via

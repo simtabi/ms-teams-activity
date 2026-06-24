@@ -29,7 +29,7 @@ self-describing binaries; all archives + deb/rpm are grouped under
 
 ```
 dist/
-  mta_darwin_arm64   mta_linux_amd64   mta_windows_amd64.exe   mta_darwin_universal   …
+  mta_macos_arm64   mta_linux_amd64   mta_windows_amd64.exe   mta_macos_universal   …
   checksums.txt
   archives/  mta_<os>_<arch>.tar.gz · mta_windows_<arch>.zip · *.deb · *.rpm · checksums.txt
 ```

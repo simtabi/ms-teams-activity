@@ -24,15 +24,32 @@ const (
 func (s Scope) Valid() bool { return s == ScopeUser || s == ScopeSystem }
 
 // ConfigDir returns the directory that holds config.json for the given scope.
+//
+// User scope follows the XDG convention on every OS (including macOS, where we
+// deliberately use ~/.config rather than ~/Library/Application Support so the
+// location is predictable and easy to find):
+//   - $XDG_CONFIG_HOME/ms-teams-activity if set
+//   - Windows: %AppData%\ms-teams-activity
+//   - otherwise: ~/.config/ms-teams-activity
 func ConfigDir(scope Scope) (string, error) {
 	if scope == ScopeSystem {
 		return systemDataDir(), nil
 	}
-	base, err := os.UserConfigDir()
+	if xdg := os.Getenv("XDG_CONFIG_HOME"); xdg != "" {
+		return filepath.Join(xdg, appDir), nil
+	}
+	if runtime.GOOS == "windows" {
+		base, err := os.UserConfigDir() // %AppData%
+		if err != nil {
+			return "", err
+		}
+		return filepath.Join(base, appDir), nil
+	}
+	home, err := os.UserHomeDir()
 	if err != nil {
 		return "", err
 	}
-	return filepath.Join(base, appDir), nil
+	return filepath.Join(home, ".config", appDir), nil
 }
 
 // ConfigPath returns the absolute path to config.json for the given scope.
@@ -48,19 +65,33 @@ func ConfigPath(scope Scope) (string, error) {
 // status.json, override.json, the single-instance lock, logs and the
 // Graph token cache.
 //
-// For user scope these live under the user cache dir so an unprivileged CLI
-// can always write the override file that the daemon watches. For system
-// scope they live alongside the system config (writable only by the service
-// account / root) — see docs/configuration.md for the multi-user caveat.
+// For user scope these live under the XDG state dir so an unprivileged CLI can
+// always write the override file that the daemon watches:
+//   - $XDG_STATE_HOME/ms-teams-activity if set
+//   - Windows: %LocalAppData%\ms-teams-activity
+//   - otherwise: ~/.local/state/ms-teams-activity
+//
+// For system scope they live alongside the system config (writable only by the
+// service account / root) — see docs/configuration.md for the multi-user caveat.
 func RuntimeDir(scope Scope) (string, error) {
 	if scope == ScopeSystem {
 		return systemDataDir(), nil
 	}
-	base, err := os.UserCacheDir()
+	if xdg := os.Getenv("XDG_STATE_HOME"); xdg != "" {
+		return filepath.Join(xdg, appDir), nil
+	}
+	if runtime.GOOS == "windows" {
+		base, err := os.UserCacheDir() // %LocalAppData%
+		if err != nil {
+			return "", err
+		}
+		return filepath.Join(base, appDir), nil
+	}
+	home, err := os.UserHomeDir()
 	if err != nil {
 		return "", err
 	}
-	return filepath.Join(base, appDir), nil
+	return filepath.Join(home, ".local", "state", appDir), nil
 }
 
 // TokenPath returns the absolute path to the Graph token cache.

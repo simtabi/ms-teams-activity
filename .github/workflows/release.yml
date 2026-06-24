@@ -87,8 +87,8 @@ jobs:
             version "${VERSION}"
             license "MIT"
             on_macos do
-              on_arm { url "${base}/mta_darwin_arm64.tar.gz"; sha256 "$(sha mta_darwin_arm64.tar.gz)" }
-              on_intel { url "${base}/mta_darwin_amd64.tar.gz"; sha256 "$(sha mta_darwin_amd64.tar.gz)" }
+              on_arm { url "${base}/mta_macos_arm64.tar.gz"; sha256 "$(sha mta_macos_arm64.tar.gz)" }
+              on_intel { url "${base}/mta_macos_amd64.tar.gz"; sha256 "$(sha mta_macos_amd64.tar.gz)" }
             end
             on_linux do
               on_arm { url "${base}/mta_linux_arm64.tar.gz"; sha256 "$(sha mta_linux_arm64.tar.gz)" }

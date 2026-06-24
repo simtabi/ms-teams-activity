@@ -63,13 +63,14 @@ Or download a prebuilt archive from the [releases page](https://github.com/simta
 or build from source (`go build -o mta ./cmd/mta`). Then run `mta config wizard`
 (or `mta config init`) and `mta install`.
 
-**Which download?** (asset names use Go's `GOOS_GOARCH` so self-update can match):
+**Which download?** (assets are named `mta_<os>_<arch>` — macOS uses the friendly
+`macos` token; self-update matches automatically):
 
 | Your machine | Asset |
 |--------------|-------|
-| macOS — any (Apple Silicon **or** Intel) | `mta_darwin_universal.tar.gz` |
-| macOS — Apple Silicon only | `mta_darwin_arm64.tar.gz` |
-| macOS — Intel only | `mta_darwin_amd64.tar.gz` |
+| macOS — any (Apple Silicon **or** Intel) | `mta_macos_universal.tar.gz` |
+| macOS — Apple Silicon only | `mta_macos_arm64.tar.gz` |
+| macOS — Intel only | `mta_macos_amd64.tar.gz` |
 | Windows 64-bit / 32-bit / ARM | `mta_windows_amd64.zip` / `_386` / `_arm64` |
 | Linux 64-bit / 32-bit / ARM64 / ARMv7 | `mta_linux_amd64.tar.gz` / `_386` / `_arm64` / `_armv7` |
 

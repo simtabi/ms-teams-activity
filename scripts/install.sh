@@ -27,9 +27,10 @@ sha_check() { # file expected
   else echo "$2  $1" | shasum -a 256 -c - >/dev/null; fi
 }
 
-# On macOS use the universal binary (Apple Silicon + Intel in one).
+# On macOS (uname reports "darwin") use the universal binary; assets are named
+# with the friendly "macos" token.
 if [ "$os" = "darwin" ]; then
-  asset="mta_darwin_universal.tar.gz"
+  asset="mta_macos_universal.tar.gz"
 else
   asset="mta_${os}_${arch}.tar.gz"
 fi

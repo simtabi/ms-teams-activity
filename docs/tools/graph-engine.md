@@ -39,7 +39,7 @@ Enable with `"engine": "graph"` (or `"both"`).
    mta auth status    # confirm the signed-in account
    ```
 
-The token is cached at `os.UserCacheDir()/ms-teams-activity/token.json`
+The token is cached at `~/.local/state/ms-teams-activity/token.json`
 (mode `0600`). Use `mta auth logout` to remove it.
 
 ## Troubleshooting

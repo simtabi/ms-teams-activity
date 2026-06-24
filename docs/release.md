@@ -30,7 +30,7 @@ all archives and packages grouped under `dist/archives/`:
 
 ```
 dist/
-  mta_<os>_<arch>[.exe]      # bare, self-describing binaries (+ mta_darwin_universal)
+  mta_<os>_<arch>[.exe]      # bare, self-describing binaries (macOS uses "macos"; + mta_macos_universal)
   checksums.txt              # sha256 over the bare binaries
   archives/
     mta_<os>_<arch>.tar.gz   # unix; the inner binary KEEPS the flat name
@@ -41,8 +41,10 @@ dist/
 
 Archive names are **version-less** (`mta_<os>_<arch>.{tar.gz,zip}`) to keep the
 self-update contract stable. macOS ships a **universal** binary
-(`mta_darwin_universal`, Apple Silicon + Intel). GitHub release assets = the
-contents of `dist/archives/`.
+(`mta_macos_universal`, Apple Silicon + Intel). GitHub release assets = the
+contents of `dist/archives/`. macOS artifacts use the `macos` token (Go's
+`darwin` is hard to recognize); self-update sets the updater's OS to `macos`
+accordingly.
 
 ```bash
 make dist          # build + bundle everything the local toolchain supports

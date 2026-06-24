@@ -4,7 +4,7 @@
 # Layout — a clean dist/ root of bare ready-to-run binaries, with all archives
 # and packages grouped under dist/archives/:
 #   dist/
-#     mta_<os>_<arch>[.exe]      bare ready-to-run binaries (incl. mta_darwin_universal)
+#     mta_<os>_<arch>[.exe]      bare ready-to-run binaries (macOS uses "macos"; incl. mta_macos_universal)
 #     checksums.txt              sha256 over the bare binaries (bare names)
 #     archives/
 #       mta_<os>_<arch>.tar.gz   unix archives (inner binary keeps the flat name)
@@ -37,10 +37,15 @@ LDFLAGS="-s -w -X ${P}.version=${VERSION} -X ${P}.date=${DATE} -X ${P}.commit=${
 host_os="$(go env GOOS)"; host_arch="$(go env GOARCH)"
 mkdir -p dist/archives
 
+# os_label maps a GOOS to the human-friendly OS token used in artifact names.
+# darwin -> macos (much easier to recognize than "darwin").
+os_label() { [ "$1" = "darwin" ] && echo "macos" || echo "$1"; }
+
 # binary_name returns the flat, self-describing binary name for a target.
 binary_name() { # goos goarch goarm
-  local base
-  if [ "$2" = "arm" ]; then base="mta_$1_armv$3"; else base="mta_$1_$2"; fi
+  local os base
+  os="$(os_label "$1")"
+  if [ "$2" = "arm" ]; then base="mta_${os}_armv$3"; else base="mta_${os}_$2"; fi
   [ "$1" = "windows" ] && base="${base}.exe"
   echo "$base"
 }
@@ -108,12 +113,12 @@ while read -r goos goarch goarm _; do
 done < build/targets.txt
 
 # macOS universal binary — Apple Silicon + Intel in one file, runs on any Mac.
-if [ -f dist/mta_darwin_arm64 ] && [ -f dist/mta_darwin_amd64 ] && command -v lipo >/dev/null 2>&1; then
-  echo ">> mta_darwin_universal  —  macOS Universal (Apple Silicon + Intel)"
+if [ -f dist/mta_macos_arm64 ] && [ -f dist/mta_macos_amd64 ] && command -v lipo >/dev/null 2>&1; then
+  echo ">> mta_macos_universal  —  macOS Universal (Apple Silicon + Intel)"
   # lipo to a temp path then rename, to avoid an occasional in-place temp-file race.
-  lipo -create -output dist/.universal.tmp dist/mta_darwin_arm64 dist/mta_darwin_amd64
-  mv -f dist/.universal.tmp dist/mta_darwin_universal
-  tar -C dist -czf dist/archives/mta_darwin_universal.tar.gz mta_darwin_universal
+  lipo -create -output dist/.universal.tmp dist/mta_macos_arm64 dist/mta_macos_amd64
+  mv -f dist/.universal.tmp dist/mta_macos_universal
+  tar -C dist -czf dist/archives/mta_macos_universal.tar.gz mta_macos_universal
 fi
 
 # checksums.txt for the bare binaries (dist root) and for archives/packages.

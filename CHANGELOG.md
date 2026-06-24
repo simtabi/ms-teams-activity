@@ -6,6 +6,22 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-06-24
+
+### Changed
+- **macOS artifacts use the friendly `macos` token** instead of Go's `darwin`
+  (e.g. `mta_macos_universal.tar.gz`, `mta_macos_arm64`); self-update sets the
+  updater OS to `macos` to match. The Go build still targets `GOOS=darwin`.
+- **User files moved to XDG locations** (macOS + Linux): config →
+  `~/.config/ms-teams-activity/` (`$XDG_CONFIG_HOME`), runtime/state/token →
+  `~/.local/state/ms-teams-activity/` (`$XDG_STATE_HOME`); no longer under
+  `~/Library`. Windows uses `%AppData%` / `%LocalAppData%`.
+
+### Upgrade notes
+- From v0.1.x: **reinstall** (old binaries look for `darwin` assets and the old
+  config path). Re-run `mta config init` (or `mta config wizard`); for the Graph
+  engine, `mta auth login` again (token cache path changed).
+
 ## [0.1.3] - 2026-06-24
 
 ### Changed
@@ -72,7 +88,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   `doctor`, `version`) and a Bubble Tea TUI dashboard.
 - `doctor` diagnostics for permissions, capabilities, and configuration.
 
-[Unreleased]: https://github.com/simtabi/ms-teams-activity/compare/v0.1.3...HEAD
+[Unreleased]: https://github.com/simtabi/ms-teams-activity/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/simtabi/ms-teams-activity/releases/tag/v0.2.0
 [0.1.3]: https://github.com/simtabi/ms-teams-activity/releases/tag/v0.1.3
 [0.1.2]: https://github.com/simtabi/ms-teams-activity/releases/tag/v0.1.2
 [0.1.1]: https://github.com/simtabi/ms-teams-activity/releases/tag/v0.1.1
