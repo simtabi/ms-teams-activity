@@ -20,6 +20,15 @@ download fails and Go is present.
 > **go install / source on macOS** needs a C toolchain (Xcode CLT) because the
 > macOS input backend uses cgo. Windows and Linux are pure Go.
 
+## Building all targets yourself
+
+`make dist` (or `./scripts/build-all.sh [version]`) builds ready-to-run binaries
+for every target in `build/targets.txt` into `./dist/` with archives, deb/rpm
+(if `nfpm` is installed), and `checksums.txt`. It builds whatever your local
+toolchain supports (macOS targets need a C compiler; everything else is pure-Go
+cross-compilation). CI runs the same script on every push to `main`, so prebuilt
+binaries are always downloadable from the latest run's Artifacts.
+
 ## Putting the binary on PATH
 
 `mta self install` copies the running binary to a standard location

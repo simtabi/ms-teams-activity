@@ -18,21 +18,37 @@ Releases are tag-driven. The git tag is the single source of version truth;
 
 The `Release` workflow (`.github/workflows/release.yml`) then runs.
 
-## Pipeline (hand-rolled, OSS)
+## Build system (single-sourced)
 
-> GoReleaser's `prebuilt` builder is Pro-only, and the macOS backend needs cgo
-> (can't cross-compile from Linux), so the pipeline builds natively per-OS.
+The target list lives in **`build/targets.txt`** and the build/bundle logic in
+**`scripts/build-all.sh`** — used identically by `make dist` (local) and CI, so
+there's one source of truth. Targets cover 64-bit, 32-bit (386/armv6/armv7),
+ARM64, RISC-V/ppc64le/s390x, Windows (incl. ARM64), macOS, and the BSDs.
+Archives are **`mta_<os>_<arch>.{tar.gz,zip}`** (arm uses `armv6`/`armv7`),
+version-less to keep the self-update contract stable. Linux mainstream arches
+also get **deb/rpm via `nfpm`** (`build/nfpm.yaml`).
 
-1. **build matrix** (one job per target): macOS arm64 + amd64 (cgo), Windows
-   amd64, Linux amd64 + arm64 (`CGO_ENABLED=0`). Each job builds `./cmd/mta`,
-   archives it as **`mta_<os>_<arch>.{tar.gz,zip}`** (version-less — required by
-   the self-update contract), and Linux jobs also build **deb/rpm via `nfpm`**.
-2. **release**: collects all artifacts, writes **`checksums.txt`** (sha256),
-   extracts the tagged `CHANGELOG.md` section as the release body (plus
-   `generate_release_notes`), and publishes the GitHub Release with every asset.
-3. **brew-scoop** (best-effort): templates the Homebrew formula and Scoop
-   manifest with the archive sha256s and pushes them to `simtabi/homebrew-tap`
-   and `simtabi/scoop-bucket`.
+```bash
+make dist          # build + bundle everything the local toolchain supports
+```
+
+## Workflows
+
+> GoReleaser's `prebuilt` builder is Pro-only and the macOS backend needs cgo
+> (no Linux cross-compile), so builds run natively: Linux/Windows/BSD cross-
+> compile CGO-free on one Linux runner; macOS uses cgo on macOS runners.
+
+- **`build-binaries.yml`** (reusable, `workflow_call`): the matrix build —
+  a `cross` job (all CGO-free targets from `build/targets.txt`) + a `mac` job
+  (darwin arm64/amd64). Uploads `dist-*` artifacts.
+- **`release.yml`** — on every `vX.Y.Z` tag (and `workflow_dispatch` for a given
+  tag): calls `build-binaries`, then `release` collects artifacts, writes
+  `checksums.txt`, extracts the CHANGELOG section as the body, and publishes the
+  GitHub Release; `brew-scoop` updates the tap/bucket (best-effort).
+- **`ci.yml`** `snapshot` job — on pushes to `main` and on demand: calls
+  `build-binaries` so **ready-to-run binaries are always available** as run
+  artifacts even before a tag (versioned `0.0.0-dev+<sha>`, which self-update
+  treats as a dev build).
 
 ## Self-update contract
 

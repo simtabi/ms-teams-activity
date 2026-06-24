@@ -23,6 +23,11 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - `doctor` performs a live Graph presence read to verify token + admin consent;
   Graph `availability`/`activity` values are validated.
 - Engine-loop unit tests and a `golangci-lint` config + CI lint job.
+- Broad release matrix (single-sourced in `build/targets.txt`): Linux
+  (amd64/386/arm64/armv7/armv6/riscv64/ppc64le/s390x), Windows
+  (amd64/386/arm64), macOS (amd64/arm64), and FreeBSD/OpenBSD/NetBSD — built and
+  bundled by a reusable workflow on every tag, with `make dist` for local builds
+  and a CI `snapshot` job that always publishes binaries as run artifacts.
 
 ### Changed
 - Entry point moved to `./cmd/mta` so `go install …/cmd/mta@latest` produces a
