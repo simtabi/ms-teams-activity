@@ -1,14 +1,31 @@
 # Configuration
 
-Configuration is a single JSON file. Manage it with:
+Configuration is a single JSON file. Manage it with the CLI, the TUI settings
+pane (`mta` → `c`), or the guided wizard:
 
 ```bash
-mta config path        # print the effective path
+mta config wizard      # guided interactive setup (engine, tz, schedule, graph)
 mta config init        # write defaults
+mta config path        # print the effective path
 mta config edit        # open in $EDITOR, validated on save
 mta config validate    # check without editing
-mta config show        # print the effective config
+mta config show        # print the effective config (JSON)
+
+# Non-interactive get/set (dotted keys, validated before save):
+mta config keys                          # list settable keys
+mta config get input.interval_seconds
+mta config set engine both
+mta config set input.method key
+
+# Schedule windows (not part of get/set):
+mta schedule list
+mta schedule add --days Mon,Tue,Wed,Thu,Fri --start 08:00 --end 17:00
+mta schedule remove 1
+mta schedule clear
 ```
+
+> Setting `engine` to `graph`/`both` requires `graph.client_id` to be set first
+> (the change is validated), so configure `graph.*` before switching engines.
 
 ## File locations
 

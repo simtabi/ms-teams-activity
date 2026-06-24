@@ -40,11 +40,43 @@ schedule, keeps the session non-idle with one of two **engines**:
 
 ## Install
 
-See [docs/installation.md](docs/installation.md). In short: build from source
-with Go ≥ 1.23 (`go build -o mta .`) or use a release binary, then
-`mta install`. The input engine should be installed with `--scope user`
-(default); a system-wide service (`--scope system`) is intended for the `graph`
+Pick whichever fits (full details in [docs/installation.md](docs/installation.md)):
+
+```bash
+# Script (macOS/Linux) — downloads + checksum-verifies the prebuilt binary
+curl -fsSL https://raw.githubusercontent.com/simtabi/ms-teams-activity/main/scripts/install.sh | sh
+
+# Homebrew (macOS/Linux)
+brew install simtabi/tap/mta
+
+# Scoop (Windows, PowerShell)
+scoop bucket add simtabi https://github.com/simtabi/scoop-bucket; scoop install mta
+
+# Debian/Ubuntu or RHEL — grab the .deb/.rpm from the latest release, then:
+sudo dpkg -i mta_*_amd64.deb        # or: sudo rpm -i mta_*_amd64.rpm
+
+# Go toolchain (Windows/Linux; macOS needs a C compiler for cgo)
+go install github.com/simtabi/ms-teams-activity/cmd/mta@latest
+```
+
+Or download a prebuilt archive from the [releases page](https://github.com/simtabi/ms-teams-activity/releases),
+or build from source (`go build -o mta ./cmd/mta`). Then run `mta config wizard`
+(or `mta config init`) and `mta install`.
+
+The **input** engine must be installed with `--scope user` (default, GUI
+session); a system-wide service (`--scope system`) is intended for the `graph`
 engine.
+
+## Updating
+
+```bash
+mta upgrade            # self-update to the latest release (verifies checksum)
+mta upgrade --check    # just report whether an update is available
+```
+
+`mta upgrade` only manages standalone installs; if you installed via Homebrew,
+Scoop, or a system package it tells you to use that manager instead. See
+[docs/updating.md](docs/updating.md).
 
 ## Documentation
 
@@ -55,7 +87,13 @@ engine.
 | [architecture.md](docs/architecture.md) | Engines, the daemon loop, control plane, and design decisions |
 | [tools/input-engine.md](docs/tools/input-engine.md) | The synthetic-input engine and its per-OS behavior |
 | [tools/graph-engine.md](docs/tools/graph-engine.md) | The Microsoft Graph engine, Entra app setup, and admin consent |
-| [release.md](docs/release.md) | Tag-driven release process |
+| [updating.md](docs/updating.md) | Self-update (`mta upgrade`), package managers, and caveats |
+| [release.md](docs/release.md) | Tag-driven release & packaging process |
+
+All actions are available from both the CLI and the interactive TUI (`mta` on a
+terminal): live status, overrides, schedule & settings editors, service control,
+auth, and updates. Configure non-interactively with `mta config set <key> <value>`
+and `mta schedule add/list/remove`.
 
 ## Responsible use
 

@@ -1,19 +1,31 @@
 # Installation
 
-## Build from source
+## Options
 
-Requires Go ≥ 1.23. On macOS a C toolchain is needed (cgo); Windows and Linux
-are pure Go.
+| Method | Command |
+|--------|---------|
+| Install script (macOS/Linux) | `curl -fsSL https://raw.githubusercontent.com/simtabi/ms-teams-activity/main/scripts/install.sh \| sh` |
+| Install script (Windows) | `irm https://raw.githubusercontent.com/simtabi/ms-teams-activity/main/scripts/install.ps1 \| iex` |
+| Homebrew | `brew install simtabi/tap/mta` |
+| Scoop | `scoop bucket add simtabi https://github.com/simtabi/scoop-bucket; scoop install mta` |
+| deb/rpm | download from releases, `sudo dpkg -i mta_*.deb` / `sudo rpm -i mta_*.rpm` |
+| go install | `go install github.com/simtabi/ms-teams-activity/cmd/mta@latest` |
+| Prebuilt archive | download `mta_<os>_<arch>.{tar.gz,zip}` from the releases page |
+| From source | `go build -o mta ./cmd/mta` |
 
-```bash
-git clone https://github.com/simtabi/ms-teams-activity
-cd ms-teams-activity
-go build -o mta .
-# optionally put it on your PATH, e.g.
-sudo install -m 0755 mta /usr/local/bin/mta     # macOS/Linux
-```
+The install scripts download the prebuilt binary and **verify its SHA-256**
+against the release `checksums.txt`, falling back to a source build if the
+download fails and Go is present.
 
-Or use the helper scripts in `scripts/` (`install.sh`, `install.ps1`).
+> **go install / source on macOS** needs a C toolchain (Xcode CLT) because the
+> macOS input backend uses cgo. Windows and Linux are pure Go.
+
+## Putting the binary on PATH
+
+`mta self install` copies the running binary to a standard location
+(`~/.local/bin`, `/usr/local/bin` with `--scope system`, or
+`%LOCALAPPDATA%\Programs\mta` on Windows). `mta self uninstall [--purge]`
+removes the service and the binary (and, with `--purge`, config + data).
 
 ## First run
 

@@ -8,6 +8,19 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 - Initial release.
+- Prebuilt release binaries for macOS/Windows/Linux with `checksums.txt`, plus
+  Homebrew tap, Scoop bucket, deb/rpm packages, `go install`, and download
+  install scripts (`scripts/install.sh`, `scripts/install.ps1`).
+- `mta upgrade` / `mta self update` self-update (checksum-verified, package-manager
+  aware), and `mta self install` / `mta self uninstall [--purge]`.
+- Configure from the CLI: `config get/set/keys/wizard` and `schedule list/add/
+  remove/clear`.
+- Full TUI hub: first-run onboarding, settings editor, schedule editor,
+  service/auth/update actions, and an update-available banner.
+
+### Changed
+- Entry point moved to `./cmd/mta` so `go install …/cmd/mta@latest` produces a
+  binary named `mta`; the cobra package moved to `internal/cli`.
 - Two pluggable engines: synthetic `input` (default) and Microsoft `graph`
   preferred presence; `both` runs them together.
 - Per-OS input backends: `SendInput` (Windows), `CGEventPost` + power assertion

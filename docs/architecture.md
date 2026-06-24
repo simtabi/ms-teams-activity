@@ -3,9 +3,12 @@
 ## Components
 
 ```
-cmd/            cobra CLI (run, install, on/off/resume, status, config, auth, doctor, tui)
-tui/            bubbletea dashboard (live status, overrides, log tail)
+cmd/mta/        main entrypoint (so `go install …/cmd/mta` yields `mta`)
+internal/cli/   cobra CLI (run, install, on/off/resume, status, config, schedule,
+                auth, doctor, self/upgrade, tui)
+tui/            bubbletea hub (dashboard, schedule & settings editors, wizard)
 internal/
+  selfupdate/   go-selfupdate wrapper + install-channel detection
   config/       versioned JSON schema, defaults, validation, OS paths
   schedule/     weekly-window + override evaluator (tz/DST/overnight aware)
   activity/     Activator interface + per-OS input backends + graph strategy
