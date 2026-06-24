@@ -1,14 +1,16 @@
 #!/usr/bin/env bash
 # Build ready-to-run binaries for the targets in build/targets.txt.
 #
-# Layout — everything flat in dist/: bare ready-to-run binaries AND their
-# archives (+ Linux packages + one checksums.txt), no subfolders:
+# Layout — a clean dist/ root of bare ready-to-run binaries, with all archives
+# and packages grouped under dist/archives/:
 #   dist/
 #     mta_<os>_<arch>[.exe]      bare ready-to-run binaries (incl. mta_darwin_universal)
-#     mta_<os>_<arch>.tar.gz     unix archives (inner binary keeps the flat name)
-#     mta_windows_<arch>.zip     windows archives
-#     mta_<arch>.deb / .rpm      Linux packages
-#     checksums.txt              sha256 over everything above (bare names)
+#     checksums.txt              sha256 over the bare binaries (bare names)
+#     archives/
+#       mta_<os>_<arch>.tar.gz   unix archives (inner binary keeps the flat name)
+#       mta_windows_<arch>.zip   windows archives
+#       mta_<arch>.deb / .rpm    Linux packages
+#       checksums.txt            sha256 over archives/packages (release + self-update + install)
 #
 # The same script powers `make dist` and CI, so the target list stays single-sourced.
 #   ./scripts/build-all.sh [version]
@@ -33,7 +35,7 @@ COMMIT="$(git rev-parse --short HEAD 2>/dev/null || echo none)"
 P=github.com/simtabi/ms-teams-activity/internal/cli
 LDFLAGS="-s -w -X ${P}.version=${VERSION} -X ${P}.date=${DATE} -X ${P}.commit=${COMMIT}"
 host_os="$(go env GOOS)"; host_arch="$(go env GOARCH)"
-mkdir -p dist
+mkdir -p dist/archives
 
 # binary_name returns the flat, self-describing binary name for a target.
 binary_name() { # goos goarch goarm
@@ -59,20 +61,20 @@ platform_label() { # goos goarch goarm
   esac
 }
 
-# archive_one bundles a flat binary into dist/ (and deb/rpm for Linux),
-# alongside the bare binary.
+# archive_one bundles a flat binary into dist/archives/ (and deb/rpm for Linux).
+# The bare binary stays in the dist/ root.
 archive_one() { # goos goarch bin
   local goos="$1" goarch="$2" bin="$3"
   if [ "$goos" = "windows" ]; then
-    (cd dist && zip -q "${bin%.exe}.zip" "$bin")
+    (cd dist && zip -q "archives/${bin%.exe}.zip" "$bin")
   else
-    tar -C dist -czf "dist/${bin}.tar.gz" "$bin"
+    tar -C dist -czf "dist/archives/${bin}.tar.gz" "$bin"
   fi
   if [ "$PACKAGES" = "1" ] && [ "$goos" = "linux" ] && command -v nfpm >/dev/null 2>&1; then
     case "$goarch" in
       amd64 | arm64 | 386)
-        ARCH="$goarch" VERSION="${VERSION#v}" nfpm pkg --config build/nfpm.yaml --packager deb --target dist/ || true
-        ARCH="$goarch" VERSION="${VERSION#v}" nfpm pkg --config build/nfpm.yaml --packager rpm --target dist/ || true
+        ARCH="$goarch" VERSION="${VERSION#v}" nfpm pkg --config build/nfpm.yaml --packager deb --target dist/archives/ || true
+        ARCH="$goarch" VERSION="${VERSION#v}" nfpm pkg --config build/nfpm.yaml --packager rpm --target dist/archives/ || true
         ;;
     esac
   fi
@@ -111,14 +113,17 @@ if [ -f dist/mta_darwin_arm64 ] && [ -f dist/mta_darwin_amd64 ] && command -v li
   # lipo to a temp path then rename, to avoid an occasional in-place temp-file race.
   lipo -create -output dist/.universal.tmp dist/mta_darwin_arm64 dist/mta_darwin_amd64
   mv -f dist/.universal.tmp dist/mta_darwin_universal
-  tar -C dist -czf dist/mta_darwin_universal.tar.gz mta_darwin_universal
+  tar -C dist -czf dist/archives/mta_darwin_universal.tar.gz mta_darwin_universal
 fi
 
-# One checksums.txt over everything (bare binaries + archives + packages), bare names.
+# checksums.txt for the bare binaries (dist root) and for archives/packages.
 if [ "$CHECKSUMS" = "1" ]; then
   ( cd dist && shasum -a 256 -- mta_* 2>/dev/null > checksums.txt || true )
+  ( cd dist/archives && shasum -a 256 -- mta_* 2>/dev/null > checksums.txt || true )
 fi
 
 echo
-echo "Artifacts in ./dist (bare binaries + archives + packages):"
+echo "Bare binaries in ./dist:"
 find dist -maxdepth 1 -type f -name 'mta_*' | sort | sed 's/^/  /'
+echo "Archives/packages in ./dist/archives:"
+find dist/archives -maxdepth 1 -type f -name 'mta_*' | sort | sed 's/^/  /'

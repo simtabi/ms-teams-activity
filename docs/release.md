@@ -25,23 +25,24 @@ The target list lives in **`build/targets.txt`** and the build/bundle logic in
 there's one source of truth. Targets cover 64-bit, 32-bit (386/armv6/armv7),
 ARM64, RISC-V/ppc64le/s390x, Windows (incl. ARM64), macOS, and the BSDs.
 
-`make dist` produces a single **flat** `dist/` containing both the bare
-ready-to-run binaries and their archives (plus Linux packages and one
-`checksums.txt`) — no subfolders:
+`make dist` produces a clean `dist/` root of bare ready-to-run binaries, with
+all archives and packages grouped under `dist/archives/`:
 
 ```
 dist/
-  mta_<os>_<arch>[.exe]       # bare, self-describing binaries (+ mta_darwin_universal)
-  mta_<os>_<arch>.tar.gz      # unix archives; the inner binary KEEPS the flat name
-  mta_windows_<arch>.zip      # windows archives; inner mta_windows_<arch>.exe
-  mta_<arch>.deb / .rpm       # nfpm (build/nfpm.yaml)
-  checksums.txt               # sha256 over everything above (bare names)
+  mta_<os>_<arch>[.exe]      # bare, self-describing binaries (+ mta_darwin_universal)
+  checksums.txt              # sha256 over the bare binaries
+  archives/
+    mta_<os>_<arch>.tar.gz   # unix; the inner binary KEEPS the flat name
+    mta_windows_<arch>.zip   # windows; inner mta_windows_<arch>.exe
+    mta_<arch>.deb / .rpm    # nfpm (build/nfpm.yaml)
+    checksums.txt            # sha256 over archives/packages
 ```
 
 Archive names are **version-less** (`mta_<os>_<arch>.{tar.gz,zip}`) to keep the
 self-update contract stable. macOS ships a **universal** binary
 (`mta_darwin_universal`, Apple Silicon + Intel). GitHub release assets = the
-full contents of `dist/` (bare binaries + archives + packages + `checksums.txt`).
+contents of `dist/archives/`.
 
 ```bash
 make dist          # build + bundle everything the local toolchain supports

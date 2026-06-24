@@ -6,7 +6,14 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
-## [0.1.2] - 2026-06-24
+## [0.1.3] - 2026-06-24
+
+### Changed
+- Build layout settled: a clean `dist/` root of bare ready-to-run binaries plus a
+  `dist/archives/` folder grouping all archives + deb/rpm (each with its own
+  `checksums.txt`). Release assets are the `dist/archives/` contents. Documented
+  as the canonical Go build/distribution layout for all Simtabi projects.
+- Hardened the macOS universal (`lipo`) step with a temp-file + atomic rename.
 
 ### Changed
 - `dist/` is now fully flat: bare ready-to-run binaries and their archives live
@@ -65,7 +72,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   `doctor`, `version`) and a Bubble Tea TUI dashboard.
 - `doctor` diagnostics for permissions, capabilities, and configuration.
 
-[Unreleased]: https://github.com/simtabi/ms-teams-activity/compare/v0.1.2...HEAD
+[Unreleased]: https://github.com/simtabi/ms-teams-activity/compare/v0.1.3...HEAD
+[0.1.3]: https://github.com/simtabi/ms-teams-activity/releases/tag/v0.1.3
 [0.1.2]: https://github.com/simtabi/ms-teams-activity/releases/tag/v0.1.2
 [0.1.1]: https://github.com/simtabi/ms-teams-activity/releases/tag/v0.1.1
 [0.1.0]: https://github.com/simtabi/ms-teams-activity/releases/tag/v0.1.0
