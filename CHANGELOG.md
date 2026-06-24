@@ -6,6 +6,13 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.1.2] - 2026-06-24
+
+### Changed
+- `dist/` is now fully flat: bare ready-to-run binaries and their archives live
+  side by side (no `dist/archives/` subfolder), with one `checksums.txt` over
+  everything. Release assets now include both the bare binaries and the archives.
+
 ## [0.1.1] - 2026-06-24
 
 ### Changed
@@ -58,6 +65,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   `doctor`, `version`) and a Bubble Tea TUI dashboard.
 - `doctor` diagnostics for permissions, capabilities, and configuration.
 
-[Unreleased]: https://github.com/simtabi/ms-teams-activity/compare/v0.1.1...HEAD
+[Unreleased]: https://github.com/simtabi/ms-teams-activity/compare/v0.1.2...HEAD
+[0.1.2]: https://github.com/simtabi/ms-teams-activity/releases/tag/v0.1.2
 [0.1.1]: https://github.com/simtabi/ms-teams-activity/releases/tag/v0.1.1
 [0.1.0]: https://github.com/simtabi/ms-teams-activity/releases/tag/v0.1.0
