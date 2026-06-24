@@ -27,9 +27,11 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Engine-loop unit tests and a `golangci-lint` config + CI lint job.
 - Broad release matrix (single-sourced in `build/targets.txt`): Linux
   (amd64/386/arm64/armv7/armv6/riscv64/ppc64le/s390x), Windows
-  (amd64/386/arm64), macOS (amd64/arm64), and FreeBSD/OpenBSD/NetBSD — built and
-  bundled by a reusable workflow on every tag, with `make dist` for local builds
-  and a CI `snapshot` job that always publishes binaries as run artifacts.
+  (amd64/386/arm64), macOS (Apple Silicon, Intel, and a **universal** binary),
+  and FreeBSD/OpenBSD/NetBSD — built and bundled by a reusable workflow on every
+  tag, with `make dist` for local builds and a CI `snapshot` job that always
+  publishes binaries as run artifacts. macOS builds (both arches + universal via
+  lipo) run on a single Apple-Silicon runner.
 
 ### Changed
 - Entry point moved to `./cmd/mta` so `go install …/cmd/mta@latest` produces a

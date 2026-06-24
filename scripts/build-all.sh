@@ -29,6 +29,23 @@ archive_base() { # goos goarch goarm
   if [ "$2" = "arm" ]; then echo "mta_$1_armv$3"; else echo "mta_$1_$2"; fi
 }
 
+# platform_label gives a human-friendly name for build output (the archive name
+# stays mta_<goos>_<goarch> because self-update matches on GOOS/GOARCH tokens).
+platform_label() { # goos goarch goarm
+  case "$1/$2" in
+    darwin/arm64) echo "macOS (Apple Silicon)" ;;
+    darwin/amd64) echo "macOS (Intel)" ;;
+    windows/amd64) echo "Windows 64-bit (x64)" ;;
+    windows/386) echo "Windows 32-bit (x86)" ;;
+    windows/arm64) echo "Windows ARM64" ;;
+    linux/amd64) echo "Linux 64-bit (x64)" ;;
+    linux/386) echo "Linux 32-bit (x86)" ;;
+    linux/arm64) echo "Linux ARM64" ;;
+    linux/arm) echo "Linux ARMv$3 (32-bit)" ;;
+    *) echo "$1/$2" ;;
+  esac
+}
+
 build_one() { # goos goarch goarm
   local goos="$1" goarch="$2" goarm="${3:-}" cgo=0 cc=""
   if [ "$goos" = "darwin" ]; then
@@ -46,7 +63,7 @@ build_one() { # goos goarch goarm
   bin="mta"; [ "$goos" = "windows" ] && bin="mta.exe"
   dirn="dist/${base}"
   mkdir -p "$dirn"
-  echo ">> ${base} (cgo=${cgo})"
+  echo ">> ${base}  —  $(platform_label "$goos" "$goarch" "$goarm") (cgo=${cgo})"
   if ! env GOOS="$goos" GOARCH="$goarch" GOARM="$goarm" CGO_ENABLED="$cgo" ${cc:+CC="$cc"} \
         go build -trimpath -ldflags "$LDFLAGS" -o "${dirn}/${bin}" ./cmd/mta; then
     echo "   FAILED ${base}"; rm -rf "$dirn"; return 1
@@ -72,6 +89,15 @@ while read -r goos goarch goarm _; do
   case "$goos" in ''|\#*) continue ;; esac
   build_one "$goos" "$goarch" "$goarm"
 done < build/targets.txt
+
+# macOS universal binary — Apple Silicon + Intel in one file, runs on any Mac.
+# Requires both darwin arches (built natively + via clang cross) and lipo.
+if [ -f dist/mta_darwin_arm64/mta ] && [ -f dist/mta_darwin_amd64/mta ] && command -v lipo >/dev/null 2>&1; then
+  echo ">> mta_darwin_universal  —  macOS Universal (Apple Silicon + Intel)"
+  mkdir -p dist/mta_darwin_universal
+  lipo -create -output dist/mta_darwin_universal/mta dist/mta_darwin_arm64/mta dist/mta_darwin_amd64/mta
+  tar -C dist/mta_darwin_universal -czf out/mta_darwin_universal.tar.gz mta
+fi
 
 cp out/* dist/ 2>/dev/null || true
 if [ "$CHECKSUMS" = "1" ]; then

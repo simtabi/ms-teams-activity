@@ -39,6 +39,9 @@ func repository() selfupdate.Repository { return selfupdate.ParseSlug(Slug) }
 func newUpdater() (*selfupdate.Updater, error) {
 	return selfupdate.NewUpdater(selfupdate.Config{
 		Validator: &selfupdate.ChecksumValidator{UniqueFilename: "checksums.txt"},
+		// On macOS, fall back to the universal (fat) binary when a per-arch
+		// asset isn't found — i.e. mta_darwin_universal.tar.gz.
+		UniversalArch: "universal",
 	})
 }
 

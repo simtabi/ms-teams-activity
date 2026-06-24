@@ -27,7 +27,12 @@ sha_check() { # file expected
   else echo "$2  $1" | shasum -a 256 -c - >/dev/null; fi
 }
 
-asset="mta_${os}_${arch}.tar.gz"
+# On macOS use the universal binary (Apple Silicon + Intel in one).
+if [ "$os" = "darwin" ]; then
+  asset="mta_darwin_universal.tar.gz"
+else
+  asset="mta_${os}_${arch}.tar.gz"
+fi
 tmp=$(mktemp -d)
 trap 'rm -rf "$tmp"' EXIT
 

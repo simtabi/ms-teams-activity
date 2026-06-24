@@ -63,6 +63,18 @@ Or download a prebuilt archive from the [releases page](https://github.com/simta
 or build from source (`go build -o mta ./cmd/mta`). Then run `mta config wizard`
 (or `mta config init`) and `mta install`.
 
+**Which download?** (asset names use Go's `GOOS_GOARCH` so self-update can match):
+
+| Your machine | Asset |
+|--------------|-------|
+| macOS — any (Apple Silicon **or** Intel) | `mta_darwin_universal.tar.gz` |
+| macOS — Apple Silicon only | `mta_darwin_arm64.tar.gz` |
+| macOS — Intel only | `mta_darwin_amd64.tar.gz` |
+| Windows 64-bit / 32-bit / ARM | `mta_windows_amd64.zip` / `_386` / `_arm64` |
+| Linux 64-bit / 32-bit / ARM64 / ARMv7 | `mta_linux_amd64.tar.gz` / `_386` / `_arm64` / `_armv7` |
+
+(Also: `riscv64`, `ppc64le`, `s390x`, and FreeBSD/OpenBSD/NetBSD.)
+
 The **input** engine must be installed with `--scope user` (default, GUI
 session); a system-wide service (`--scope system`) is intended for the `graph`
 engine.
