@@ -56,6 +56,7 @@ const (
 	screenAccount
 	screenHelp
 	screenOnboard
+	screenTZ
 )
 
 // menuID identifies a main-menu entry.
@@ -119,6 +120,8 @@ type model struct {
 	setRow     int
 	setInput   textinput.Model
 	setEditing bool
+
+	tz picker // searchable timezone picker (screenTZ)
 
 	online *bool // nil = not yet checked
 }
@@ -210,6 +213,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m.updateEditor(msg)
 		case screenSettings:
 			return m.updateSettings(msg)
+		case screenTZ:
+			return m.updateTZ(msg)
 		case screenService:
 			return m.updateService(msg)
 		case screenAccount:
@@ -435,6 +440,21 @@ func onboardLabels() []string {
 	return out
 }
 
+// ---- Timezone picker (screenTZ) ----
+
+func (m model) updateTZ(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
+	chosen, cancelled := m.tz.update(msg)
+	switch {
+	case cancelled:
+		m.screen = screenSettings
+	case chosen != "":
+		m.edit.Timezone = chosen
+		m.screen = screenSettings
+		m.flash = "timezone set to " + chosen
+	}
+	return m, nil
+}
+
 // ---- Styles ----
 
 var (
@@ -477,6 +497,8 @@ func (m model) View() string {
 		return m.editorView()
 	case screenSettings:
 		return m.settingsView()
+	case screenTZ:
+		return m.tz.view()
 	case screenHelp:
 		return m.helpView()
 	case screenOnboard:

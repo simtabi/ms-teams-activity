@@ -43,6 +43,12 @@ toggle always-on · `s` save · `Esc` cancel.
 numbers, toggle booleans) · `Enter` edit a text field, `Enter` again to commit /
 `Esc` to cancel the edit · `s` save (validated) · `Esc` close without saving.
 
+On the **Timezone** row, `Enter` opens a **searchable picker** prepopulated with
+all IANA zones (plus `Local`/`UTC`): type to filter (e.g. `new york`, `london`,
+`utc` — `/` and `_` are treated as spaces), `↑/↓` to move the scrolling list,
+`Enter` to select, `Esc` to cancel. The setup wizard's timezone step uses the
+same picker.
+
 ## First run
 
 With no config yet, the TUI opens a first-run **menu** (same ↑/↓ + Enter

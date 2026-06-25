@@ -432,8 +432,8 @@ func TestSettingsSaveInvalidGraphStays(t *testing.T) {
 func TestSettingsTextEditFlow(t *testing.T) {
 	m := cursorAt(newModel(testOpts(t, true)), miSettings)
 	m = press(m, "enter")
-	m.setRow = rowTimezone
-	m = press(m, "enter") // begin editing
+	m.setRow = rowClientID // a free-text row (timezone uses the picker)
+	m = press(m, "enter")  // begin editing
 	if !m.setEditing {
 		t.Fatal("enter on a text row should start editing")
 	}
@@ -442,11 +442,11 @@ func TestSettingsTextEditFlow(t *testing.T) {
 	if m.setEditing {
 		t.Fatal("enter should commit and stop editing")
 	}
-	if m.edit.Timezone == "Local" {
-		t.Fatalf("timezone should have changed from edit, got %q", m.edit.Timezone)
+	if m.edit.Graph.ClientID == "" {
+		t.Fatalf("client id should have changed from edit, got %q", m.edit.Graph.ClientID)
 	}
 	// esc during editing cancels editing (not the screen)
-	m.setRow = rowClientID
+	m.setRow = rowTenantID
 	m = press(m, "enter")
 	m = press(m, "esc")
 	if m.setEditing {
@@ -454,6 +454,42 @@ func TestSettingsTextEditFlow(t *testing.T) {
 	}
 	if m.screen != screenSettings {
 		t.Fatal("esc during edit should not leave settings")
+	}
+}
+
+func TestTimezonePicker(t *testing.T) {
+	m := cursorAt(newModel(testOpts(t, true)), miSettings)
+	m = press(m, "enter") // enter settings
+	m.setRow = rowTimezone
+	m = press(m, "enter") // open the searchable picker
+	if m.screen != screenTZ {
+		t.Fatalf("timezone row should open the picker, got %v", m.screen)
+	}
+	// Type to filter, then select the top match.
+	for _, k := range []string{"u", "t", "c"} {
+		m = press(m, k)
+	}
+	if len(m.tz.matches) == 0 {
+		t.Fatal("filtering 'utc' should yield matches")
+	}
+	m = press(m, "enter")
+	if m.screen != screenSettings {
+		t.Fatalf("selecting should return to settings, got %v", m.screen)
+	}
+	if !strings.Contains(strings.ToLower(m.edit.Timezone), "utc") {
+		t.Fatalf("expected a UTC zone, got %q", m.edit.Timezone)
+	}
+
+	// Esc cancels back to settings without changing the value.
+	m.setRow = rowTimezone
+	before := m.edit.Timezone
+	m = press(m, "enter")
+	m = press(m, "esc")
+	if m.screen != screenSettings {
+		t.Fatal("esc should return to settings")
+	}
+	if m.edit.Timezone != before {
+		t.Fatalf("esc should not change the timezone, got %q want %q", m.edit.Timezone, before)
 	}
 }
 

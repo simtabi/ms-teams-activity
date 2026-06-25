@@ -85,6 +85,12 @@ func (m model) updateSettings(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	case " ":
 		m.adjustRow(1)
 	case "enter":
+		if m.setRow == rowTimezone {
+			// Timezone uses the searchable picker rather than free-text entry.
+			m.tz = newPicker("Timezone", m.edit.Timezone)
+			m.screen = screenTZ
+			return m, nil
+		}
 		if textRows[m.setRow] {
 			m.setInput.SetValue(m.currentText())
 			m.setInput.CursorEnd()

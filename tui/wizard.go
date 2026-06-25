@@ -42,6 +42,7 @@ type wizardModel struct {
 	cfg    config.Config
 	cursor int
 	input  textinput.Model
+	tz     picker
 	saved  bool
 	err    error
 	flash  string
@@ -75,7 +76,7 @@ func newWizard(opts Options) wizardModel {
 	if existing, err := config.Load(opts.ConfigPath); err == nil {
 		cfg = existing
 	}
-	return wizardModel{opts: opts, cfg: cfg, input: ti}
+	return wizardModel{opts: opts, cfg: cfg, input: ti, tz: newPicker("Timezone (or 'Local')", cfg.Timezone)}
 }
 
 func (m wizardModel) Init() tea.Cmd { return nil }
@@ -99,7 +100,16 @@ func (m wizardModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			presetChoices[i].apply(&m.cfg)
 		})
 	case wTimezone:
-		return m.text(key, &m.cfg.Timezone, "Local")
+		chosen, cancelled := m.tz.update(key)
+		switch {
+		case cancelled:
+			m.step = m.prev()
+		case chosen != "":
+			m.cfg.Timezone = chosen
+			m.cursor = 0
+			m.step = m.next()
+		}
+		return m, nil
 	case wClientID:
 		return m.text(key, &m.cfg.Graph.ClientID, "")
 	case wTenantID:
@@ -215,13 +225,15 @@ func (m wizardModel) prev() int {
 }
 
 func (m wizardModel) View() string {
+	// The timezone step is a full searchable picker with its own footer.
+	if m.step == wTimezone {
+		return titleStyle.Render("  Setup wizard") + "\n\n" + m.tz.view()
+	}
 	var b strings.Builder
 	b.WriteString(titleStyle.Render("  Setup wizard") + "\n\n")
 	switch m.step {
 	case wEngine:
 		b.WriteString(renderChoices("How should Teams be kept active?", engineLabels(), m.cursor))
-	case wTimezone:
-		b.WriteString("Timezone for the schedule (IANA name, or 'Local'):\n\n" + m.input.View())
 	case wPreset:
 		b.WriteString(renderChoices("Pick a schedule:", presetLabels(), m.cursor))
 	case wClientID:

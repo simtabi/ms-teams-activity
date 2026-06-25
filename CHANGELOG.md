@@ -6,6 +6,16 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-06-25
+
+### Added
+- **Searchable timezone picker** in the TUI: the Settings timezone row and the
+  setup wizard now open a prepopulated, filterable list of all IANA zones (plus
+  `Local`/`UTC`) instead of a free-text field. Type to filter (`/` and `_` count
+  as spaces, so `new york` finds `America/New_York`), `↑/↓` to move the scrolling
+  list, `Enter` to select. Backed by a new `internal/tz` package + a reusable
+  `picker` component (`bubbles/textinput` + a windowed list).
+
 ## [0.5.2] - 2026-06-25
 
 ### Changed
@@ -229,7 +239,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   `doctor`, `version`) and a Bubble Tea TUI dashboard.
 - `doctor` diagnostics for permissions, capabilities, and configuration.
 
-[Unreleased]: https://github.com/simtabi/vigil/compare/v0.5.2...HEAD
+[Unreleased]: https://github.com/simtabi/vigil/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/simtabi/vigil/releases/tag/v0.6.0
 [0.5.2]: https://github.com/simtabi/vigil/releases/tag/v0.5.2
 [0.5.1]: https://github.com/simtabi/vigil/releases/tag/v0.5.1
 [0.5.0]: https://github.com/simtabi/vigil/releases/tag/v0.5.0
