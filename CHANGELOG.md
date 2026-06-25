@@ -6,6 +6,22 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-06-25
+
+### Added
+- **Brand identity**: an eye mark (open eye + green "available" pupil) in
+  `assets/vigil.svg`, rasterized to PNGs and embedded as the **Windows binary
+  icon** + version info (`make icons` regenerates both from the SVG).
+- **Banner**: `vigil version` now prints a masthead — name, tagline, version/
+  commit/date, author, contact, and product/source URLs — colored on a terminal,
+  plain ASCII when piped or under `NO_COLOR` (`--json` unchanged).
+- **Network-connection indicator**: a live **green ● online / red ● offline** dot
+  in the TUI status strip, an `Internet:` line in `vigil status` (`online` in
+  `--json`), and a `network` check in `vigil doctor`. Detection uses the standard
+  `generate_204` captive-portal probe with a TCP-dial fallback and a short
+  timeout (best-effort, silent on failure).
+- **Glyph icons** in the TUI menu and header (with the eye mark).
+
 ## [0.4.0] - 2026-06-25
 
 ### Changed
@@ -199,7 +215,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   `doctor`, `version`) and a Bubble Tea TUI dashboard.
 - `doctor` diagnostics for permissions, capabilities, and configuration.
 
-[Unreleased]: https://github.com/simtabi/vigil/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/simtabi/vigil/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/simtabi/vigil/releases/tag/v0.5.0
 [0.4.0]: https://github.com/simtabi/vigil/releases/tag/v0.4.0
 [0.3.1]: https://github.com/simtabi/vigil/releases/tag/v0.3.1
 [0.3.0]: https://github.com/simtabi/vigil/releases/tag/v0.3.0

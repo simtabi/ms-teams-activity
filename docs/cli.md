@@ -65,6 +65,18 @@ Invalid input is rejected early with a clear message rather than acted on:
   with an empty `graph.client_id` fails).
 - `schedule add` checks day names and `HH:MM` times.
 
+## Network status
+
+The TUI status strip shows a live connectivity dot — **green ● online** /
+**red ● offline** — and `vigil status` (`Internet:` line, `online` in `--json`)
+and `vigil doctor` (a `network` check) report the same. It matters for the Graph
+engine and self-update, which need a connection; the input engine does not.
+
+Detection follows the standard captive-portal method: a tiny HTTP request to a
+well-known `generate_204` endpoint (Cloudflare, then Google) with a short timeout,
+falling back to a raw TCP dial. It is best-effort and silent on failure. The only
+outbound traffic is that small probe, made to detect connectivity.
+
 ## Honored environment variables
 
 `NO_COLOR`, `TERM`, `EDITOR` (used by `config edit`), and

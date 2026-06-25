@@ -22,7 +22,13 @@ The `Release` workflow (`.github/workflows/release.yml`) then runs.
 
 The target list lives in **`build/targets.txt`** and the build/bundle logic in
 **`scripts/build-all.sh`** — used identically by `make dist` (local) and CI, so
-there's one source of truth. Targets cover 64-bit, 32-bit (386/armv6/armv7),
+there's one source of truth.
+
+The **Windows binary icon + version info** are embedded via committed
+`cmd/vigil/rsrc_windows_*.syso` files that `go build` auto-links — no extra build
+step. Regenerate them (and the brand PNGs) from `assets/vigil.svg` with
+`make icons` after changing the logo; commit the results. See
+[brand.md](brand.md). Targets cover 64-bit, 32-bit (386/armv6/armv7),
 ARM64, RISC-V/ppc64le/s390x, Windows (incl. ARM64), macOS, and the BSDs.
 
 `make dist` produces a clean `dist/` root of bare ready-to-run binaries, with

@@ -12,6 +12,7 @@ import (
 
 	"github.com/simtabi/vigil/internal/activity"
 	"github.com/simtabi/vigil/internal/config"
+	"github.com/simtabi/vigil/internal/netcheck"
 	"github.com/spf13/cobra"
 )
 
@@ -46,6 +47,7 @@ var doctorCmd = &cobra.Command{
 		}
 
 		checkInput(cfg, cfgErr, add)
+		checkNetwork(add)
 		checkGraph(cfg, cfgErr, add)
 		checkScope(cfg, cfgErr, add)
 
@@ -112,6 +114,16 @@ func checkMacScreensaver(cfg config.Config, add func(checkLevel, string, string)
 		return
 	}
 	add(levelOK, "auto-lock", fmt.Sprintf("screensaver after %ds > interval %ds", secs, cfg.Input.IntervalSeconds))
+}
+
+func checkNetwork(add func(checkLevel, string, string)) {
+	ctx, cancel := context.WithTimeout(context.Background(), 4*time.Second)
+	defer cancel()
+	if netcheck.Online(ctx) {
+		add(levelOK, "network", "internet reachable")
+	} else {
+		add(levelWarn, "network", "no internet detected — the graph engine and self-update need a connection")
+	}
 }
 
 func checkLinuxUinput(add func(checkLevel, string, string)) {

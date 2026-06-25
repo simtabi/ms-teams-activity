@@ -2,6 +2,7 @@ package tui
 
 import (
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
@@ -351,6 +352,22 @@ func TestSettingsCycleAndClamp(t *testing.T) {
 	}
 	if m.edit.Input.JitterSeconds >= m.edit.Input.IntervalSeconds {
 		t.Fatalf("jitter %d must stay below interval %d", m.edit.Input.JitterSeconds, m.edit.Input.IntervalSeconds)
+	}
+}
+
+func TestConnectivityIndicator(t *testing.T) {
+	m := newModel(testOpts(t, true))
+	if got := m.netStrip(); !strings.Contains(got, "net") {
+		t.Fatalf("expected unknown net state before a check, got %q", got)
+	}
+	// Drive the async result deterministically (no live probe in tests).
+	on, _ := m.Update(netMsg{online: true})
+	if got := on.(model).netStrip(); !strings.Contains(got, "online") {
+		t.Fatalf("expected online, got %q", got)
+	}
+	off, _ := m.Update(netMsg{online: false})
+	if got := off.(model).netStrip(); !strings.Contains(got, "offline") {
+		t.Fatalf("expected offline, got %q", got)
 	}
 }
 

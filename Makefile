@@ -4,7 +4,7 @@ VERSION ?= $(shell git describe --tags --always --dirty 2>/dev/null || echo dev)
 LDFLAGS := -s -w -X $(PKG)/internal/cli.version=$(VERSION)
 MAIN := ./cmd/vigil
 
-.PHONY: build test vet fmt lint cross dist install clean
+.PHONY: build test vet fmt lint cross dist install clean icons
 
 build: ## Build the binary for the current OS
 	go build -trimpath -ldflags "$(LDFLAGS)" -o $(BINARY) $(MAIN)
@@ -28,6 +28,9 @@ dist: ## Build ready-to-run binaries for all targets into ./dist
 
 install: build ## Build and install to /usr/local/bin (may need sudo)
 	install -m 0755 $(BINARY) /usr/local/bin/$(BINARY)
+
+icons: ## Regenerate brand PNGs + Windows resource (.syso) from assets/vigil.svg
+	cd tools/iconz && go run .
 
 clean: ## Remove build artifacts
 	rm -f $(BINARY)

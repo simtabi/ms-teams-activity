@@ -12,8 +12,10 @@ The home screen is a **menu**:
 - `Esc` — go back to the menu
 - `q` / `Ctrl-C` — quit
 
-A header shows the scope + version, a live **status strip** (state · engine ·
-override · next change), and an **update banner** when a newer release exists.
+A header shows the eye mark (◉) + scope + version, a live **status strip** with a
+**connectivity dot** (green ● online / red ● offline) plus state · engine ·
+override · next change, and an **update banner** when a newer release exists. Menu
+items carry glyph icons (◉ ⏯ ▦ ⚙ ⛭ ◐ ⭮).
 
 ## Screens
 

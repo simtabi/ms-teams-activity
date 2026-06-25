@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/icons/vigil_128.png" width="96" height="96" alt="vigil" />
+</p>
+
 # vigil
 
 Keep Microsoft Teams showing as **Available** on a configurable work schedule —
@@ -118,6 +122,7 @@ curl -fsSL https://raw.githubusercontent.com/simtabi/vigil/main/scripts/uninstal
 | [configuration.md](docs/configuration.md) | The `config.json` schema, schedules, overrides, and file locations |
 | [tui.md](docs/tui.md) | The interactive menu UI — navigation, screens, and editor keys |
 | [cli.md](docs/cli.md) | CLI conventions — flags, prompts, color, exit codes, env vars |
+| [brand.md](docs/brand.md) | The eye mark, brand assets, banner, and regenerating icons |
 | [architecture.md](docs/architecture.md) | Engines, the daemon loop, control plane, and design decisions |
 | [tools/input-engine.md](docs/tools/input-engine.md) | The synthetic-input engine and its per-OS behavior |
 | [tools/graph-engine.md](docs/tools/graph-engine.md) | The Microsoft Graph engine, Entra app setup, and admin consent |

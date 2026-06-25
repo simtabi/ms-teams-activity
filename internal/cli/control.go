@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"time"
@@ -8,6 +9,7 @@ import (
 	"github.com/simtabi/vigil/internal/cli/ui"
 	"github.com/simtabi/vigil/internal/config"
 	"github.com/simtabi/vigil/internal/control"
+	"github.com/simtabi/vigil/internal/netcheck"
 	"github.com/simtabi/vigil/internal/schedule"
 	"github.com/simtabi/vigil/internal/service"
 	"github.com/spf13/cobra"
@@ -122,11 +124,16 @@ func showStatus() error {
 		}
 	}
 
+	netCtx, cancel := context.WithTimeout(context.Background(), 4*time.Second)
+	online := netcheck.Online(netCtx)
+	cancel()
+
 	if flagJSON {
-		return printJSON(map[string]any{"service": svcState, "daemon": st, "daemon_error": errString(statusErr)})
+		return printJSON(map[string]any{"service": svcState, "online": online, "daemon": st, "daemon_error": errString(statusErr)})
 	}
 
 	fmt.Printf("Service:   %s\n", svcState)
+	fmt.Printf("Internet:  %s\n", onlineWord(online))
 	if statusErr != nil {
 		fmt.Printf("Daemon:    %s\n", statusErr)
 		return nil
@@ -157,6 +164,13 @@ func activeWord(active bool) string {
 		return "activate"
 	}
 	return "deactivate"
+}
+
+func onlineWord(online bool) string {
+	if online {
+		return "connected"
+	}
+	return "offline"
 }
 
 func errString(err error) string {

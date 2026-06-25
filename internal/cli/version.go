@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"runtime"
 
+	"github.com/simtabi/vigil/internal/brand"
+	"github.com/simtabi/vigil/internal/cli/ui"
 	"github.com/spf13/cobra"
 )
 
@@ -24,8 +26,8 @@ var versionCmd = &cobra.Command{
 				"go": runtime.Version(), "platform": runtime.GOOS + "/" + runtime.GOARCH,
 			})
 		}
-		fmt.Printf("vigil %s (commit %s, built %s, %s %s/%s)\n",
-			version, commit, date, runtime.Version(), runtime.GOOS, runtime.GOARCH)
+		fmt.Println(brand.Banner(version, commit, date, ui.ColorEnabled()))
+		fmt.Printf("%s %s/%s\n", runtime.Version(), runtime.GOOS, runtime.GOARCH)
 		return nil
 	},
 }

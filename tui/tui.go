@@ -16,8 +16,10 @@ import (
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/simtabi/vigil/internal/brand"
 	"github.com/simtabi/vigil/internal/config"
 	"github.com/simtabi/vigil/internal/control"
+	"github.com/simtabi/vigil/internal/netcheck"
 	"github.com/simtabi/vigil/internal/schedule"
 	"github.com/simtabi/vigil/internal/selfupdate"
 )
@@ -39,6 +41,8 @@ func Run(opts Options) error {
 
 type tickMsg time.Time
 type updateMsg struct{ info selfupdate.Info }
+type netMsg struct{ online bool }
+type netTickMsg time.Time
 
 type screen int
 
@@ -77,15 +81,15 @@ type menuEntry struct {
 
 func mainMenu() []menuEntry {
 	return []menuEntry{
-		{miStatus, "Status", "Live daemon status and recent activity"},
-		{miOverride, "Override", "Force active/inactive now, or resume the schedule"},
-		{miSchedule, "Schedule", "Edit the weekly active windows"},
-		{miSettings, "Settings", "Engine, interval, movement, timezone, Graph"},
-		{miService, "Service", "Install / start / stop / restart the background service"},
-		{miAccount, "Account", "Microsoft Graph sign-in (for the graph engine)"},
-		{miUpdate, "Check for updates", "Download and install the latest release"},
-		{miHelp, "Help", "Keys and what everything does"},
-		{miQuit, "Quit", "Exit the dashboard"},
+		{miStatus, "◉ Status", "Live daemon status and recent activity"},
+		{miOverride, "⏯ Override", "Force active/inactive now, or resume the schedule"},
+		{miSchedule, "▦ Schedule", "Edit the weekly active windows"},
+		{miSettings, "⚙ Settings", "Engine, interval, movement, timezone, Graph"},
+		{miService, "⛭ Service", "Install / start / stop / restart the background service"},
+		{miAccount, "◐ Account", "Microsoft Graph sign-in (for the graph engine)"},
+		{miUpdate, "⭮ Check for updates", "Download and install the latest release"},
+		{miHelp, "? Help", "Keys and what everything does"},
+		{miQuit, "⏻ Quit", "Exit the dashboard"},
 	}
 }
 
@@ -115,6 +119,8 @@ type model struct {
 	setRow     int
 	setInput   textinput.Model
 	setEditing bool
+
+	online *bool // nil = not yet checked
 }
 
 func newModel(opts Options) model {
@@ -130,11 +136,23 @@ func newModel(opts Options) model {
 }
 
 func (m model) Init() tea.Cmd {
-	return tea.Batch(tick(), checkUpdateCmd(m.opts.Version))
+	return tea.Batch(tick(), checkUpdateCmd(m.opts.Version), netCheckCmd(), netTick())
 }
 
 func tick() tea.Cmd {
 	return tea.Tick(time.Second, func(t time.Time) tea.Msg { return tickMsg(t) })
+}
+
+func netTick() tea.Cmd {
+	return tea.Tick(15*time.Second, func(t time.Time) tea.Msg { return netTickMsg(t) })
+}
+
+func netCheckCmd() tea.Cmd {
+	return func() tea.Msg {
+		ctx, cancel := context.WithTimeout(context.Background(), 4*time.Second)
+		defer cancel()
+		return netMsg{online: netcheck.Online(ctx)}
+	}
 }
 
 func checkUpdateCmd(version string) tea.Cmd {
@@ -168,6 +186,12 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case updateMsg:
 		m.update = msg.info
 		return m, nil
+	case netMsg:
+		online := msg.online
+		m.online = &online
+		return m, nil
+	case netTickMsg:
+		return m, tea.Batch(netCheckCmd(), netTick())
 	case tickMsg:
 		m.refresh()
 		return m, tick()
@@ -394,7 +418,20 @@ var (
 	selFieldStyle = lipgloss.NewStyle().Background(lipgloss.Color("63")).Foreground(lipgloss.Color("231"))
 	dayOnStyle    = lipgloss.NewStyle().Foreground(lipgloss.Color("42")).Bold(true)
 	dayOffStyle   = lipgloss.NewStyle().Foreground(lipgloss.Color("240"))
+	onlineStyle   = lipgloss.NewStyle().Foreground(lipgloss.Color("42")).Bold(true)
+	offlineStyle  = lipgloss.NewStyle().Foreground(lipgloss.Color("196")).Bold(true)
 )
+
+// netStrip renders the connectivity indicator (green ● online / red ● offline).
+func (m model) netStrip() string {
+	if m.online == nil {
+		return helpStyle.Render("● net …")
+	}
+	if *m.online {
+		return onlineStyle.Render("● online")
+	}
+	return offlineStyle.Render("● offline")
+}
 
 func (m model) View() string {
 	switch m.screen {
@@ -422,13 +459,13 @@ func (m model) View() string {
 // header renders the title line + optional update banner + status strip.
 func (m model) header() string {
 	var b strings.Builder
-	b.WriteString(titleStyle.Render("  MS Teams Activity") + "  " +
+	b.WriteString(titleStyle.Render("  "+brand.Eye+" "+brand.Pretty) + "  " +
 		helpStyle.Render("scope="+string(m.opts.Scope)+"  v"+m.opts.Version) + "\n")
 	if m.update.Available {
 		b.WriteString("\n" + bannerStyle.Render(fmt.Sprintf("update available: %s → %s",
 			m.update.Current, m.update.Latest)) + "\n")
 	}
-	b.WriteString(helpStyle.Render("  "+m.statusStrip()) + "\n\n")
+	b.WriteString("  " + m.netStrip() + helpStyle.Render("   "+m.statusStrip()) + "\n\n")
 	return b.String()
 }
 
@@ -538,7 +575,7 @@ func (m model) helpView() string {
 
 func (m model) onboardView() string {
 	var b strings.Builder
-	b.WriteString(titleStyle.Render("  MS Teams Activity — first run") + "\n\n")
+	b.WriteString(titleStyle.Render("  "+brand.Eye+" "+brand.Pretty+" — first run") + "\n\n")
 	b.WriteString(boxStyle.Render("No config found at:\n  "+m.opts.ConfigPath+"\n\nLet's set it up.") + "\n")
 	if m.flash != "" {
 		b.WriteString(flashStyle.Render("• "+m.flash) + "\n")
