@@ -12,8 +12,12 @@ import (
 
 // Identity — keep these exact; they appear in the banner, docs, and metadata.
 const (
-	Name        = "vigil"
-	Pretty      = "Vigil"
+	Name = "vigil"
+	// Pretty is the short product name (compact UI, e.g. the TUI header).
+	Pretty = "Vigil"
+	// Title is the full banner headline; it names the supported tools (more are
+	// planned beyond Teams and Slack).
+	Title       = "Vigil for MS Teams and Slack"
 	Tagline     = "Keep Microsoft Teams active on a schedule."
 	Description = "Keeps your Microsoft Teams presence green — on a schedule or " +
 		"at will — using synthetic input or the Graph presence API."
@@ -47,7 +51,7 @@ func Banner(version, commit, date string, color bool) string {
 	}
 	if !color {
 		lines := []string{
-			Pretty + " — " + Tagline,
+			Title + " — " + Tagline,
 			"",
 		}
 		for _, r := range rows {
@@ -57,7 +61,7 @@ func Banner(version, commit, date string, color bool) string {
 	}
 
 	var b strings.Builder
-	b.WriteString(accentStyle.Render(Eye+" "+strings.ToUpper(Pretty)) + "  " + dimStyle.Render(Tagline))
+	b.WriteString(accentStyle.Render(Eye+" "+Title) + "  " + dimStyle.Render(Tagline))
 	b.WriteString("\n")
 	for _, r := range rows {
 		b.WriteString("\n" + labelStyle.Render(fmt.Sprintf("%-8s", r[0])) + " " + r[1])

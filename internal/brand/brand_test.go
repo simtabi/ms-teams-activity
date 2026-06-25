@@ -7,7 +7,7 @@ import (
 
 func TestBannerPlainHasIdentity(t *testing.T) {
 	b := Banner("1.2.3", "abc1234", "2026-06-25", false)
-	for _, want := range []string{Pretty, Tagline, "1.2.3", "abc1234", Author, Contact, URLProduct, URLRepo} {
+	for _, want := range []string{Title, Tagline, "1.2.3", "abc1234", Author, Contact, URLProduct, URLRepo} {
 		if !strings.Contains(b, want) {
 			t.Errorf("plain banner missing %q\n%s", want, b)
 		}

@@ -6,6 +6,12 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.5.1] - 2026-06-25
+
+### Changed
+- Banner headline is now "Vigil for MS Teams and Slack" (Slack and other tools
+  are planned). The compact name shown in the TUI header stays "Vigil".
+
 ## [0.5.0] - 2026-06-25
 
 ### Added
@@ -215,7 +221,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   `doctor`, `version`) and a Bubble Tea TUI dashboard.
 - `doctor` diagnostics for permissions, capabilities, and configuration.
 
-[Unreleased]: https://github.com/simtabi/vigil/compare/v0.5.0...HEAD
+[Unreleased]: https://github.com/simtabi/vigil/compare/v0.5.1...HEAD
+[0.5.1]: https://github.com/simtabi/vigil/releases/tag/v0.5.1
 [0.5.0]: https://github.com/simtabi/vigil/releases/tag/v0.5.0
 [0.4.0]: https://github.com/simtabi/vigil/releases/tag/v0.4.0
 [0.3.1]: https://github.com/simtabi/vigil/releases/tag/v0.3.1
