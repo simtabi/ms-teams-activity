@@ -1,7 +1,7 @@
 # Interactive TUI
 
-Run `mta` on a terminal (or `mta tui` explicitly) to open the interactive UI.
-Everything here is also available as plain CLI commands — see `mta --help`.
+Run `vigil` on a terminal (or `vigil tui` explicitly) to open the interactive UI.
+Everything here is also available as plain CLI commands — see `vigil --help`.
 
 ## Navigation
 
@@ -23,7 +23,7 @@ override · next change), and an **update banner** when a newer release exists.
 | **Override** | Force the session active or inactive, or resume the schedule. "Force active" has timed presets (indefinite / 1h / 2h / 4h) matching the CLI's `on --for`. |
 | **Schedule** | Edit the weekly active windows (see keys below). |
 | **Settings** | Engine, input interval/jitter/method/move-pixels, prevent-sleep, timezone, and Graph `client_id`/`tenant_id`. |
-| **Service** | Install / start / stop / restart / uninstall the background service (runs the matching `mta` command). |
+| **Service** | Install / start / stop / restart / uninstall the background service (runs the matching `vigil` command). |
 | **Account** | Microsoft Graph sign-in / status / sign-out (for the `graph` engine). |
 | **Check for updates** | Self-update to the latest release (skipped on dev builds / package-manager installs). |
 | **Help** | Key reference. |

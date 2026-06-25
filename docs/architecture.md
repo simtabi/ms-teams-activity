@@ -3,7 +3,7 @@
 ## Components
 
 ```
-cmd/mta/        main entrypoint (so `go install …/cmd/mta` yields `mta`)
+cmd/vigil/        main entrypoint (so `go install …/cmd/vigil` yields `vigil`)
 internal/cli/   cobra CLI (run, install, on/off/resume, status, config, schedule,
                 auth, doctor, self/upgrade, tui)
 tui/            bubbletea hub (dashboard, schedule & settings editors, wizard)

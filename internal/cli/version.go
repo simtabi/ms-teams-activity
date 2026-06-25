@@ -24,7 +24,7 @@ var versionCmd = &cobra.Command{
 				"go": runtime.Version(), "platform": runtime.GOOS + "/" + runtime.GOARCH,
 			})
 		}
-		fmt.Printf("mta %s (commit %s, built %s, %s %s/%s)\n",
+		fmt.Printf("vigil %s (commit %s, built %s, %s %s/%s)\n",
 			version, commit, date, runtime.Version(), runtime.GOOS, runtime.GOARCH)
 		return nil
 	},

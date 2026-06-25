@@ -1,21 +1,21 @@
-# ms-teams-activity (`mta`)
+# vigil
 
 Keep Microsoft Teams showing as **Available** on a configurable work schedule —
 or at will. Cross-platform (macOS, Windows, Linux), JSON-configured, with a CLI
 and an interactive TUI, installable per-user or system-wide.
 
 ```bash
-mta config init        # write a default config (Mon–Fri 08:00–17:00)
-mta doctor             # check platform capabilities & permissions
-mta install            # install + start the background service
-mta on --for 2h        # at-will override; or `mta off`, `mta resume`
-mta                    # open the TUI dashboard
+vigil config init        # write a default config (Mon–Fri 08:00–17:00)
+vigil doctor             # check platform capabilities & permissions
+vigil install            # install + start the background service
+vigil on --for 2h        # at-will override; or `vigil off`, `vigil resume`
+vigil                    # open the TUI dashboard
 ```
 
 ## How it works
 
 Teams marks you **Away** after ~5 minutes of OS idle and immediately when the
-screen locks. `mta` runs a small background service that, during your active
+screen locks. `vigil` runs a small background service that, during your active
 schedule, keeps the session non-idle with one of two **engines**:
 
 - **`input` (default)** — injects tiny, periodic, human-like input that resets
@@ -44,37 +44,37 @@ Pick whichever fits (full details in [docs/installation.md](docs/installation.md
 
 ```bash
 # Script (macOS/Linux) — downloads + checksum-verifies the prebuilt binary
-curl -fsSL https://raw.githubusercontent.com/simtabi/ms-teams-activity/main/scripts/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/simtabi/vigil/main/scripts/install.sh | sh
 # …or in one shot, also configure + install + start the background daemon:
-curl -fsSL https://raw.githubusercontent.com/simtabi/ms-teams-activity/main/scripts/install.sh | sh -s -- --with-service
+curl -fsSL https://raw.githubusercontent.com/simtabi/vigil/main/scripts/install.sh | sh -s -- --with-service
 
 # Homebrew (macOS/Linux)
-brew install simtabi/tap/mta
+brew install simtabi/tap/vigil
 
 # Scoop (Windows, PowerShell)
-scoop bucket add simtabi https://github.com/simtabi/scoop-bucket; scoop install mta
+scoop bucket add simtabi https://github.com/simtabi/scoop-bucket; scoop install vigil
 
 # Debian/Ubuntu or RHEL — grab the .deb/.rpm from the latest release, then:
-sudo dpkg -i mta_*_amd64.deb        # or: sudo rpm -i mta_*_amd64.rpm
+sudo dpkg -i vigil_*_amd64.deb        # or: sudo rpm -i vigil_*_amd64.rpm
 
 # Go toolchain (Windows/Linux; macOS needs a C compiler for cgo)
-go install github.com/simtabi/ms-teams-activity/cmd/mta@latest
+go install github.com/simtabi/vigil/cmd/vigil@latest
 ```
 
-Or download a prebuilt archive from the [releases page](https://github.com/simtabi/ms-teams-activity/releases),
-or build from source (`go build -o mta ./cmd/mta`). Then run `mta config wizard`
-(or `mta config init`) and `mta install`.
+Or download a prebuilt archive from the [releases page](https://github.com/simtabi/vigil/releases),
+or build from source (`go build -o vigil ./cmd/vigil`). Then run `vigil config wizard`
+(or `vigil config init`) and `vigil install`.
 
-**Which download?** (assets are named `mta_<os>_<arch>` — macOS uses the friendly
+**Which download?** (assets are named `vigil_<os>_<arch>` — macOS uses the friendly
 `macos` token; self-update matches automatically):
 
 | Your machine | Asset |
 |--------------|-------|
-| macOS — any (Apple Silicon **or** Intel) | `mta_macos_universal.tar.gz` |
-| macOS — Apple Silicon only | `mta_macos_arm64.tar.gz` |
-| macOS — Intel only | `mta_macos_amd64.tar.gz` |
-| Windows 64-bit / 32-bit / ARM | `mta_windows_amd64.zip` / `_386` / `_arm64` |
-| Linux 64-bit / 32-bit / ARM64 / ARMv7 | `mta_linux_amd64.tar.gz` / `_386` / `_arm64` / `_armv7` |
+| macOS — any (Apple Silicon **or** Intel) | `vigil_macos_universal.tar.gz` |
+| macOS — Apple Silicon only | `vigil_macos_arm64.tar.gz` |
+| macOS — Intel only | `vigil_macos_amd64.tar.gz` |
+| Windows 64-bit / 32-bit / ARM | `vigil_windows_amd64.zip` / `_386` / `_arm64` |
+| Linux 64-bit / 32-bit / ARM64 / ARMv7 | `vigil_linux_amd64.tar.gz` / `_386` / `_arm64` / `_armv7` |
 
 (Also: `riscv64`, `ppc64le`, `s390x`, and FreeBSD/OpenBSD/NetBSD.)
 
@@ -85,29 +85,29 @@ engine.
 ## Updating
 
 ```bash
-mta upgrade            # self-update to the latest release (verifies checksum)
-mta upgrade --check    # just report whether an update is available
+vigil upgrade            # self-update to the latest release (verifies checksum)
+vigil upgrade --check    # just report whether an update is available
 ```
 
-`mta upgrade` only manages standalone installs; if you installed via Homebrew,
+`vigil upgrade` only manages standalone installs; if you installed via Homebrew,
 Scoop, or a system package it tells you to use that manager instead. See
 [docs/updating.md](docs/updating.md).
 
 ## The daemon
 
 ```bash
-mta install --init     # turnkey: write a default config if needed, install + start the service
-mta status             # service + daemon state
-mta restart            # restart after config changes (config is also hot-reloaded)
-mta stop / mta start
-mta uninstall          # stop + remove the service (keeps the binary)
+vigil install --init     # turnkey: write a default config if needed, install + start the service
+vigil status             # service + daemon state
+vigil restart            # restart after config changes (config is also hot-reloaded)
+vigil stop / vigil start
+vigil uninstall          # stop + remove the service (keeps the binary)
 ```
 
 Remove everything (service + binary, `--purge` also deletes config/data):
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/simtabi/ms-teams-activity/main/scripts/uninstall.sh | sh
-# or: mta self uninstall --purge
+curl -fsSL https://raw.githubusercontent.com/simtabi/vigil/main/scripts/uninstall.sh | sh
+# or: vigil self uninstall --purge
 ```
 
 ## Documentation
@@ -121,17 +121,17 @@ curl -fsSL https://raw.githubusercontent.com/simtabi/ms-teams-activity/main/scri
 | [architecture.md](docs/architecture.md) | Engines, the daemon loop, control plane, and design decisions |
 | [tools/input-engine.md](docs/tools/input-engine.md) | The synthetic-input engine and its per-OS behavior |
 | [tools/graph-engine.md](docs/tools/graph-engine.md) | The Microsoft Graph engine, Entra app setup, and admin consent |
-| [updating.md](docs/updating.md) | Self-update (`mta upgrade`), package managers, and caveats |
+| [updating.md](docs/updating.md) | Self-update (`vigil upgrade`), package managers, and caveats |
 | [release.md](docs/release.md) | Tag-driven release & packaging process |
 
-All actions are available from both the CLI and the interactive TUI (`mta` on a
+All actions are available from both the CLI and the interactive TUI (`vigil` on a
 terminal): live status, overrides, schedule & settings editors, service control,
-auth, and updates. Configure non-interactively with `mta config set <key> <value>`
-and `mta schedule add/list/remove`.
+auth, and updates. Configure non-interactively with `vigil config set <key> <value>`
+and `vigil schedule add/list/remove`.
 
 ## Responsible use
 
-`mta` is a personal-productivity tool. The input engine is dual-use
+`vigil` is a personal-productivity tool. The input engine is dual-use
 (equivalent to a "mouse jiggler"/Caffeine). **Respect your employer's policies
 and applicable agreements** — presence is often used by colleagues to gauge
 availability. Don't use this to misrepresent working hours where that would
@@ -141,6 +141,6 @@ breach policy. You are responsible for how you use it.
 
 MIT © 2026 Simtabi LLC. See [LICENSE](LICENSE).
 
-- Product: <https://opensource.simtabi.com/products/ms-teams-activity>
-- Docs: <https://opensource.simtabi.com/documentation/ms-teams-activity>
-- Issues: <https://github.com/simtabi/ms-teams-activity/issues>
+- Product: <https://opensource.simtabi.com/products/vigil>
+- Docs: <https://opensource.simtabi.com/documentation/vigil>
+- Issues: <https://github.com/simtabi/vigil/issues>

@@ -4,35 +4,35 @@
 # Layout — a clean dist/ root of bare ready-to-run binaries, with all archives
 # and packages grouped under dist/archives/:
 #   dist/
-#     mta_<os>_<arch>[.exe]      bare ready-to-run binaries (macOS uses "macos"; incl. mta_macos_universal)
+#     vigil_<os>_<arch>[.exe]      bare ready-to-run binaries (macOS uses "macos"; incl. vigil_macos_universal)
 #     checksums.txt              sha256 over the bare binaries (bare names)
 #     archives/
-#       mta_<os>_<arch>.tar.gz   unix archives (inner binary keeps the flat name)
-#       mta_windows_<arch>.zip   windows archives
-#       mta_<arch>.deb / .rpm    Linux packages
+#       vigil_<os>_<arch>.tar.gz   unix archives (inner binary keeps the flat name)
+#       vigil_windows_<arch>.zip   windows archives
+#       vigil_<arch>.deb / .rpm    Linux packages
 #       checksums.txt            sha256 over archives/packages (release + self-update + install)
 #
 # The same script powers `make dist` and CI, so the target list stays single-sourced.
 #   ./scripts/build-all.sh [version]
 #
 # Env knobs (used by CI; sensible defaults locally):
-#   MTA_SCOPE=all|cross|darwin   which targets to build (default: all)
-#   MTA_DARWIN_ARCH=arm64|amd64  restrict darwin to one arch (matrix runners)
-#   MTA_PACKAGES=1               also build deb/rpm (needs nfpm on PATH)
-#   MTA_CHECKSUMS=1              write checksums.txt files (default on for `all`)
+#   VIGIL_SCOPE=all|cross|darwin   which targets to build (default: all)
+#   VIGIL_DARWIN_ARCH=arm64|amd64  restrict darwin to one arch (matrix runners)
+#   VIGIL_PACKAGES=1               also build deb/rpm (needs nfpm on PATH)
+#   VIGIL_CHECKSUMS=1              write checksums.txt files (default on for `all`)
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
 VERSION="${1:-$(git describe --tags --always --dirty 2>/dev/null || echo dev)}"
-SCOPE="${MTA_SCOPE:-all}"
-DARWIN_ARCH="${MTA_DARWIN_ARCH:-}"
-PACKAGES="${MTA_PACKAGES:-0}"
-CHECKSUMS="${MTA_CHECKSUMS:-}"
+SCOPE="${VIGIL_SCOPE:-all}"
+DARWIN_ARCH="${VIGIL_DARWIN_ARCH:-}"
+PACKAGES="${VIGIL_PACKAGES:-0}"
+CHECKSUMS="${VIGIL_CHECKSUMS:-}"
 [ -z "$CHECKSUMS" ] && { [ "$SCOPE" = "all" ] && CHECKSUMS=1 || CHECKSUMS=0; }
 
 DATE="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 COMMIT="$(git rev-parse --short HEAD 2>/dev/null || echo none)"
-P=github.com/simtabi/ms-teams-activity/internal/cli
+P=github.com/simtabi/vigil/internal/cli
 LDFLAGS="-s -w -X ${P}.version=${VERSION} -X ${P}.date=${DATE} -X ${P}.commit=${COMMIT}"
 host_os="$(go env GOOS)"; host_arch="$(go env GOARCH)"
 
@@ -48,7 +48,7 @@ os_label() { [ "$1" = "darwin" ] && echo "macos" || echo "$1"; }
 binary_name() { # goos goarch goarm
   local os base
   os="$(os_label "$1")"
-  if [ "$2" = "arm" ]; then base="mta_${os}_armv$3"; else base="mta_${os}_$2"; fi
+  if [ "$2" = "arm" ]; then base="vigil_${os}_armv$3"; else base="vigil_${os}_$2"; fi
   [ "$1" = "windows" ] && base="${base}.exe"
   echo "$base"
 }
@@ -104,7 +104,7 @@ build_one() { # goos goarch goarm
   bin="$(binary_name "$goos" "$goarch" "$goarm")"
   echo ">> ${bin}  —  $(platform_label "$goos" "$goarch" "$goarm") (cgo=${cgo})"
   if ! env GOOS="$goos" GOARCH="$goarch" GOARM="$goarm" CGO_ENABLED="$cgo" ${cc:+CC="$cc"} \
-        go build -trimpath -ldflags "$LDFLAGS" -o "dist/${bin}" ./cmd/mta; then
+        go build -trimpath -ldflags "$LDFLAGS" -o "dist/${bin}" ./cmd/vigil; then
     echo "   FAILED ${bin}"; rm -f "dist/${bin}"; return 1
   fi
   archive_one "$goos" "$goarch" "$bin"
@@ -116,22 +116,22 @@ while read -r goos goarch goarm _; do
 done < build/targets.txt
 
 # macOS universal binary — Apple Silicon + Intel in one file, runs on any Mac.
-if [ -f dist/mta_macos_arm64 ] && [ -f dist/mta_macos_amd64 ] && command -v lipo >/dev/null 2>&1; then
-  echo ">> mta_macos_universal  —  macOS Universal (Apple Silicon + Intel)"
+if [ -f dist/vigil_macos_arm64 ] && [ -f dist/vigil_macos_amd64 ] && command -v lipo >/dev/null 2>&1; then
+  echo ">> vigil_macos_universal  —  macOS Universal (Apple Silicon + Intel)"
   # lipo to a temp path then rename, to avoid an occasional in-place temp-file race.
-  lipo -create -output dist/.universal.tmp dist/mta_macos_arm64 dist/mta_macos_amd64
-  mv -f dist/.universal.tmp dist/mta_macos_universal
-  tar -C dist -czf dist/archives/mta_macos_universal.tar.gz mta_macos_universal
+  lipo -create -output dist/.universal.tmp dist/vigil_macos_arm64 dist/vigil_macos_amd64
+  mv -f dist/.universal.tmp dist/vigil_macos_universal
+  tar -C dist -czf dist/archives/vigil_macos_universal.tar.gz vigil_macos_universal
 fi
 
 # checksums.txt for the bare binaries (dist root) and for archives/packages.
 if [ "$CHECKSUMS" = "1" ]; then
-  ( cd dist && shasum -a 256 -- mta_* 2>/dev/null > checksums.txt || true )
-  ( cd dist/archives && shasum -a 256 -- mta_* 2>/dev/null > checksums.txt || true )
+  ( cd dist && shasum -a 256 -- vigil_* 2>/dev/null > checksums.txt || true )
+  ( cd dist/archives && shasum -a 256 -- vigil_* 2>/dev/null > checksums.txt || true )
 fi
 
 echo
 echo "Bare binaries in ./dist:"
-find dist -maxdepth 1 -type f -name 'mta_*' | sort | sed 's/^/  /'
+find dist -maxdepth 1 -type f -name 'vigil_*' | sort | sed 's/^/  /'
 echo "Archives/packages in ./dist/archives:"
-find dist/archives -maxdepth 1 -type f -name 'mta_*' | sort | sed 's/^/  /'
+find dist/archives -maxdepth 1 -type f -name 'vigil_*' | sort | sed 's/^/  /'

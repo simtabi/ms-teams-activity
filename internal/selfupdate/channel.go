@@ -7,7 +7,7 @@ import "strings"
 type Channel int
 
 const (
-	// Standalone — installed via the install script, `mta self install`, or a
+	// Standalone — installed via the install script, `vigil self install`, or a
 	// downloaded release archive. Safe to self-update.
 	Standalone Channel = iota
 	// Homebrew — managed by `brew`.
@@ -47,16 +47,16 @@ func (c Channel) String() string {
 	}
 }
 
-// SelfUpdatable reports whether `mta upgrade` should replace this binary.
+// SelfUpdatable reports whether `vigil upgrade` should replace this binary.
 func (c Channel) SelfUpdatable() bool { return c == Standalone }
 
 // Advice returns guidance for updating via the detected package manager.
 func (c Channel) Advice() string {
 	switch c {
 	case Homebrew:
-		return "this binary is managed by Homebrew — update with `brew upgrade mta`"
+		return "this binary is managed by Homebrew — update with `brew upgrade vigil`"
 	case Scoop:
-		return "this binary is managed by Scoop — update with `scoop update mta`"
+		return "this binary is managed by Scoop — update with `scoop update vigil`"
 	case SystemPackage:
 		return "this binary is managed by your system package manager — update with `apt upgrade` / `dnf upgrade`"
 	default:

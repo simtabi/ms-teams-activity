@@ -1,8 +1,8 @@
-BINARY := mta
-PKG := github.com/simtabi/ms-teams-activity
+BINARY := vigil
+PKG := github.com/simtabi/vigil
 VERSION ?= $(shell git describe --tags --always --dirty 2>/dev/null || echo dev)
 LDFLAGS := -s -w -X $(PKG)/internal/cli.version=$(VERSION)
-MAIN := ./cmd/mta
+MAIN := ./cmd/vigil
 
 .PHONY: build test vet fmt lint cross dist install clean
 

@@ -1,5 +1,5 @@
 name: Bug report
-description: Report a problem with mta
+description: Report a problem with vigil
 labels: [bug]
 body:
   - type: textarea
@@ -14,8 +14,8 @@ body:
     attributes:
       label: Steps to reproduce
       placeholder: |
-        1. mta config init
-        2. mta install
+        1. vigil config init
+        2. vigil install
         3. ...
     validations:
       required: true
@@ -36,11 +36,11 @@ body:
   - type: textarea
     id: doctor
     attributes:
-      label: Output of `mta doctor`
+      label: Output of `vigil doctor`
       render: shell
   - type: input
     id: version
     attributes:
-      label: Version (`mta version`)
+      label: Version (`vigil version`)
     validations:
       required: true

@@ -7,7 +7,7 @@ import (
 )
 
 // appDir is the per-application subdirectory name used under every base path.
-const appDir = "ms-teams-activity"
+const appDir = "vigil"
 
 // Scope determines whether files are resolved against per-user or
 // system-wide (all users) locations.
@@ -28,9 +28,9 @@ func (s Scope) Valid() bool { return s == ScopeUser || s == ScopeSystem }
 // User scope follows the XDG convention on every OS (including macOS, where we
 // deliberately use ~/.config rather than ~/Library/Application Support so the
 // location is predictable and easy to find):
-//   - $XDG_CONFIG_HOME/ms-teams-activity if set
-//   - Windows: %AppData%\ms-teams-activity
-//   - otherwise: ~/.config/ms-teams-activity
+//   - $XDG_CONFIG_HOME/vigil if set
+//   - Windows: %AppData%\vigil
+//   - otherwise: ~/.config/vigil
 func ConfigDir(scope Scope) (string, error) {
 	if scope == ScopeSystem {
 		return systemDataDir(), nil
@@ -67,9 +67,9 @@ func ConfigPath(scope Scope) (string, error) {
 //
 // For user scope these live under the XDG state dir so an unprivileged CLI can
 // always write the override file that the daemon watches:
-//   - $XDG_STATE_HOME/ms-teams-activity if set
-//   - Windows: %LocalAppData%\ms-teams-activity
-//   - otherwise: ~/.local/state/ms-teams-activity
+//   - $XDG_STATE_HOME/vigil if set
+//   - Windows: %LocalAppData%\vigil
+//   - otherwise: ~/.local/state/vigil
 //
 // For system scope they live alongside the system config (writable only by the
 // service account / root) — see docs/configuration.md for the multi-user caveat.

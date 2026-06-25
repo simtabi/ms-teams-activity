@@ -1,6 +1,6 @@
 # nfpm config for deb/rpm packages. ARCH/VERSION/GOARCH are supplied via the
 # environment by the release workflow (nfpm expands ${VAR}).
-name: mta
+name: vigil
 arch: ${ARCH}
 platform: linux
 version: ${VERSION}
@@ -10,8 +10,8 @@ maintainer: "Imani Manyara <imani@simtabi.com>"
 description: |
   Keep Microsoft Teams active on a configurable schedule.
 vendor: Simtabi LLC
-homepage: https://opensource.simtabi.com/products/ms-teams-activity
+homepage: https://opensource.simtabi.com/products/vigil
 license: MIT
 contents:
-  - src: ./dist/mta_linux_${GOARCH}
-    dst: /usr/bin/mta
+  - src: ./dist/vigil_linux_${GOARCH}
+    dst: /usr/bin/vigil

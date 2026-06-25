@@ -8,7 +8,7 @@ import (
 
 // errAlreadyRunning reports that another daemon holds the runtime lock.
 func errAlreadyRunning(rt string) error {
-	return fmt.Errorf("another mta daemon is already running for %s (use `mta stop` or a different --scope)", rt)
+	return fmt.Errorf("another vigil daemon is already running for %s (use `vigil stop` or a different --scope)", rt)
 }
 
 // printJSON writes v as indented JSON to stdout.

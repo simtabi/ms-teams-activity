@@ -1,17 +1,17 @@
 #!/usr/bin/env bash
-# Install mta on macOS/Linux by downloading the latest prebuilt release and
+# Install vigil on macOS/Linux by downloading the latest prebuilt release and
 # verifying its SHA-256. Falls back to building from source if Go is present.
 #
-#   curl -fsSL https://raw.githubusercontent.com/simtabi/ms-teams-activity/main/scripts/install.sh | sh
+#   curl -fsSL https://raw.githubusercontent.com/simtabi/vigil/main/scripts/install.sh | sh
 #   ./scripts/install.sh                  # binary only, to ~/.local/bin
 #   ./scripts/install.sh --with-service   # also configure + install + start the daemon
 #   sudo ./scripts/install.sh             # to /usr/local/bin
 set -eu
 
-REPO="simtabi/ms-teams-activity"
+REPO="simtabi/vigil"
 BASE="https://github.com/${REPO}/releases/latest/download"
 
-WITH_SERVICE="${MTA_WITH_SERVICE:-0}"
+WITH_SERVICE="${VIGIL_WITH_SERVICE:-0}"
 for a in "$@"; do
   case "$a" in
     --with-service) WITH_SERVICE=1 ;;
@@ -39,9 +39,9 @@ sha_check() { # file expected
 # On macOS (uname reports "darwin") use the universal binary; assets are named
 # with the friendly "macos" token.
 if [ "$os" = "darwin" ]; then
-  asset="mta_macos_universal.tar.gz"
+  asset="vigil_macos_universal.tar.gz"
 else
-  asset="mta_${os}_${arch}.tar.gz"
+  asset="vigil_${os}_${arch}.tar.gz"
 fi
 tmp=$(mktemp -d)
 trap 'rm -rf "$tmp"' EXIT
@@ -58,29 +58,29 @@ if curl $dl_opts "${BASE}/${asset}" -o "${tmp}/${asset}" && curl -fsSL "${BASE}/
   echo "Verifying checksum..."
   sha_check "${tmp}/${asset}" "$want"
   tar -C "$tmp" -xzf "${tmp}/${asset}"
-  # The archive contains a flat-named binary (e.g. mta_darwin_universal); install it as mta.
-  install -m 0755 "${tmp}/${asset%.tar.gz}" "${PREFIX}/mta"
-  echo "Installed: ${PREFIX}/mta"
+  # The archive contains a flat-named binary (e.g. vigil_darwin_universal); install it as vigil.
+  install -m 0755 "${tmp}/${asset%.tar.gz}" "${PREFIX}/vigil"
+  echo "Installed: ${PREFIX}/vigil"
 else
   echo "Download failed; trying to build from source..." >&2
   command -v go >/dev/null 2>&1 || { echo "Go not found and download failed." >&2; exit 1; }
-  GOBIN="$PREFIX" go install "github.com/${REPO}/cmd/mta@latest"
-  echo "Installed (from source): ${PREFIX}/mta"
+  GOBIN="$PREFIX" go install "github.com/${REPO}/cmd/vigil@latest"
+  echo "Installed (from source): ${PREFIX}/vigil"
 fi
 
 case ":$PATH:" in *":$PREFIX:"*) ;; *) echo "note: add $PREFIX to your PATH";; esac
 
 if [ "$WITH_SERVICE" = "1" ]; then
   echo "Setting up the background service..."
-  "${PREFIX}/mta" install --init || echo "service setup failed; run '${PREFIX}/mta' doctor"
-  echo "Done. Manage it with: mta status / mta restart / mta stop"
+  "${PREFIX}/vigil" install --init || echo "service setup failed; run '${PREFIX}/vigil' doctor"
+  echo "Done. Manage it with: vigil status / vigil restart / vigil stop"
 else
   cat <<EOF
 
 Next steps:
-  mta config wizard    # guided setup (or: mta config init)
-  mta doctor           # check capabilities & permissions
-  mta install          # install + start the background service
+  vigil config wizard    # guided setup (or: vigil config init)
+  vigil doctor           # check capabilities & permissions
+  vigil install          # install + start the background service
                        # (or re-run this installer with --with-service)
 
 Uninstall later:

@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for your interest in improving `ms-teams-activity`.
+Thanks for your interest in improving `vigil`.
 
 ## Development
 

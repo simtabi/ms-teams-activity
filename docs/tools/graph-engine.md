@@ -35,12 +35,12 @@ Enable with `"engine": "graph"` (or `"both"`).
 5. Sign in:
 
    ```bash
-   mta auth login     # follow the device-code prompt
-   mta auth status    # confirm the signed-in account
+   vigil auth login     # follow the device-code prompt
+   vigil auth status    # confirm the signed-in account
    ```
 
-The token is cached at `~/.local/state/ms-teams-activity/token.json`
-(mode `0600`). Use `mta auth logout` to remove it.
+The token is cached at `~/.local/state/vigil/token.json`
+(mode `0600`). Use `vigil auth logout` to remove it.
 
 ## Troubleshooting
 

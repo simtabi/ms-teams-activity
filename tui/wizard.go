@@ -6,7 +6,7 @@ import (
 
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/simtabi/ms-teams-activity/internal/config"
+	"github.com/simtabi/vigil/internal/config"
 )
 
 // RunWizard launches the guided setup wizard and writes config on completion.

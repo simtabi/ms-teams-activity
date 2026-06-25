@@ -10,8 +10,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/simtabi/ms-teams-activity/internal/activity"
-	"github.com/simtabi/ms-teams-activity/internal/config"
+	"github.com/simtabi/vigil/internal/activity"
+	"github.com/simtabi/vigil/internal/config"
 	"github.com/spf13/cobra"
 )
 
@@ -77,7 +77,7 @@ func checkInput(cfg config.Config, cfgErr error, add func(checkLevel, string, st
 		if activity.AccessibilityTrusted() {
 			add(levelOK, "accessibility", "process is trusted for Accessibility")
 		} else {
-			add(levelFail, "accessibility", "NOT trusted — grant Accessibility to mta in System Settings → Privacy & Security → Accessibility")
+			add(levelFail, "accessibility", "NOT trusted — grant Accessibility to vigil in System Settings → Privacy & Security → Accessibility")
 		}
 		checkMacScreensaver(cfg, add)
 	case "linux":
@@ -143,7 +143,7 @@ func checkGraph(cfg config.Config, cfgErr error, add func(checkLevel, string, st
 		return
 	}
 	if acct == "" {
-		add(levelWarn, "graph", "not signed in — run `mta auth login` (needs admin-consented Presence.ReadWrite)")
+		add(levelWarn, "graph", "not signed in — run `vigil auth login` (needs admin-consented Presence.ReadWrite)")
 		return
 	}
 	// Live read verifies the token works and the permission is consented.

@@ -1,4 +1,4 @@
-// Package tui implements the interactive terminal UI for mta. The home screen is
+// Package tui implements the interactive terminal UI for vigil. The home screen is
 // a navigable menu (↑/↓ or j/k, Enter to select, Esc to go back); from it you
 // reach the live status, manual overrides, the schedule and settings editors,
 // service control, the Graph account, updates, and help.
@@ -16,10 +16,10 @@ import (
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/simtabi/ms-teams-activity/internal/config"
-	"github.com/simtabi/ms-teams-activity/internal/control"
-	"github.com/simtabi/ms-teams-activity/internal/schedule"
-	"github.com/simtabi/ms-teams-activity/internal/selfupdate"
+	"github.com/simtabi/vigil/internal/config"
+	"github.com/simtabi/vigil/internal/control"
+	"github.com/simtabi/vigil/internal/schedule"
+	"github.com/simtabi/vigil/internal/selfupdate"
 )
 
 // Options configures the TUI with resolved paths for the active scope.
@@ -155,7 +155,7 @@ func (m *model) refresh() {
 	m.logs = tailLines(control.LogPath(m.opts.RuntimeDir), 6)
 }
 
-// execSelf suspends the TUI, runs `mta <args>`, then resumes and refreshes.
+// execSelf suspends the TUI, runs `vigil <args>`, then resumes and refreshes.
 func (m model) execSelf(args ...string) tea.Cmd {
 	c := exec.Command(m.exe, args...)
 	return tea.ExecProcess(c, func(error) tea.Msg { return tickMsg(time.Now()) })
@@ -531,7 +531,7 @@ func (m model) helpView() string {
 		"  Service   install/start/stop/restart the background service",
 		"  Account   Microsoft Graph sign-in for the graph engine",
 		"",
-		"Everything here is also available as CLI commands — see `mta --help`.",
+		"Everything here is also available as CLI commands — see `vigil --help`.",
 	}, "\n")
 	return m.menuFrame("Help", body)
 }

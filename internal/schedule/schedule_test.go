@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/simtabi/ms-teams-activity/internal/config"
+	"github.com/simtabi/vigil/internal/config"
 )
 
 func cfgWith(tz string, always bool, win ...config.Window) config.Config {

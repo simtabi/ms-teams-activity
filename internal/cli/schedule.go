@@ -5,8 +5,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/simtabi/ms-teams-activity/internal/cli/ui"
-	"github.com/simtabi/ms-teams-activity/internal/config"
+	"github.com/simtabi/vigil/internal/cli/ui"
+	"github.com/simtabi/vigil/internal/config"
 	"github.com/spf13/cobra"
 )
 

@@ -1,12 +1,12 @@
-// Package cmd implements the mta command-line interface.
+// Package cmd implements the vigil command-line interface.
 package cli
 
 import (
 	"fmt"
 	"os"
 
-	"github.com/simtabi/ms-teams-activity/internal/cli/ui"
-	"github.com/simtabi/ms-teams-activity/internal/config"
+	"github.com/simtabi/vigil/internal/cli/ui"
+	"github.com/simtabi/vigil/internal/config"
 	"github.com/spf13/cobra"
 	"golang.org/x/term"
 )
@@ -22,9 +22,9 @@ var (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "mta",
+	Use:   "vigil",
 	Short: "Keep Microsoft Teams active on a configurable schedule",
-	Long: `mta (ms-teams-activity) keeps Microsoft Teams showing as Available on a
+	Long: `vigil keeps Microsoft Teams showing as Available on a
 configurable work schedule (e.g. Mon-Fri 08:00-17:00) or at will, using either
 synthetic input or the Microsoft Graph presence API.
 
@@ -33,11 +33,11 @@ Run without a subcommand on a terminal to open the interactive TUI.
 Global flags: --yes/-y (assume yes), --no-input (never prompt; for scripts),
 --no-color, --json, --scope user|system. Honored env vars: NO_COLOR, TERM,
 EDITOR (config edit), XDG_CONFIG_HOME/XDG_STATE_HOME (file locations).`,
-	Example: `  mta                      # open the interactive TUI
-  mta install --init       # configure + install + start the daemon
-  mta on --for 2h          # stay Available for two hours
-  mta status --json        # machine-readable status
-  mta upgrade --check      # see if a newer release exists`,
+	Example: `  vigil                      # open the interactive TUI
+  vigil install --init       # configure + install + start the daemon
+  vigil on --for 2h          # stay Available for two hours
+  vigil status --json        # machine-readable status
+  vigil upgrade --check      # see if a newer release exists`,
 	SilenceUsage:  true,
 	SilenceErrors: true,
 	RunE: func(cmd *cobra.Command, _ []string) error {
@@ -108,7 +108,7 @@ func loadConfig() (config.Config, error) {
 	}
 	c, err := config.Load(p)
 	if os.IsNotExist(err) {
-		return config.Config{}, fmt.Errorf("no config at %s — run `mta config init` first", p)
+		return config.Config{}, fmt.Errorf("no config at %s — run `vigil config init` first", p)
 	}
 	return c, err
 }

@@ -37,7 +37,7 @@ jobs:
           TAG="${{ github.event.inputs.tag || github.ref_name }}"
           # Bare filenames (no ./ prefix) so install scripts and self-update can
           # look assets up by name.
-          cd collected && sha256sum mta_* > checksums.txt && cd ..
+          cd collected && sha256sum vigil_* > checksums.txt && cd ..
           VERSION="${TAG#v}"
           awk -v ver="$VERSION" '
             $0 ~ "^## \\[" ver "\\]" {grab=1; next}
@@ -72,7 +72,7 @@ jobs:
           [ -n "${TAP_GITHUB_TOKEN:-}" ] || { echo "no TAP_GITHUB_TOKEN; skipping"; exit 0; }
           TAG="${{ github.event.inputs.tag || github.ref_name }}"
           VERSION="${TAG#v}"
-          base="https://github.com/simtabi/ms-teams-activity/releases/download/${TAG}"
+          base="https://github.com/simtabi/vigil/releases/download/${TAG}"
           sha() { sha256sum "collected/$1" | awk '{print $1}'; }
 
           git config --global user.email "imanimanyara@users.noreply.github.com"
@@ -80,43 +80,43 @@ jobs:
 
           git clone "https://x:${TAP_GITHUB_TOKEN}@github.com/simtabi/homebrew-tap.git" tap
           mkdir -p tap/Formula
-          cat > tap/Formula/mta.rb <<EOF
-          class Mta < Formula
+          cat > tap/Formula/vigil.rb <<EOF
+          class Vigil < Formula
             desc "Keep Microsoft Teams active on a configurable schedule"
-            homepage "https://opensource.simtabi.com/products/ms-teams-activity"
+            homepage "https://opensource.simtabi.com/products/vigil"
             version "${VERSION}"
             license "MIT"
             on_macos do
-              on_arm { url "${base}/mta_macos_arm64.tar.gz"; sha256 "$(sha mta_macos_arm64.tar.gz)" }
-              on_intel { url "${base}/mta_macos_amd64.tar.gz"; sha256 "$(sha mta_macos_amd64.tar.gz)" }
+              on_arm { url "${base}/vigil_macos_arm64.tar.gz"; sha256 "$(sha vigil_macos_arm64.tar.gz)" }
+              on_intel { url "${base}/vigil_macos_amd64.tar.gz"; sha256 "$(sha vigil_macos_amd64.tar.gz)" }
             end
             on_linux do
-              on_arm { url "${base}/mta_linux_arm64.tar.gz"; sha256 "$(sha mta_linux_arm64.tar.gz)" }
-              on_intel { url "${base}/mta_linux_amd64.tar.gz"; sha256 "$(sha mta_linux_amd64.tar.gz)" }
+              on_arm { url "${base}/vigil_linux_arm64.tar.gz"; sha256 "$(sha vigil_linux_arm64.tar.gz)" }
+              on_intel { url "${base}/vigil_linux_amd64.tar.gz"; sha256 "$(sha vigil_linux_amd64.tar.gz)" }
             end
             def install
-              # archives contain a flat-named binary (mta_<os>_<arch>); install it as mta
-              bin.install Dir["mta_*"].first => "mta"
+              # archives contain a flat-named binary (vigil_<os>_<arch>); install it as vigil
+              bin.install Dir["vigil_*"].first => "vigil"
             end
             test do
-              system "#{bin}/mta", "version"
+              system "#{bin}/vigil", "version"
             end
           end
           EOF
-          (cd tap && git add -A && git commit -m "mta ${VERSION}" && git push)
+          (cd tap && git add -A && git commit -m "vigil ${VERSION}" && git push)
 
           git clone "https://x:${TAP_GITHUB_TOKEN}@github.com/simtabi/scoop-bucket.git" bucket
-          cat > bucket/mta.json <<EOF
+          cat > bucket/vigil.json <<EOF
           {
             "version": "${VERSION}",
             "description": "Keep Microsoft Teams active on a configurable schedule",
-            "homepage": "https://opensource.simtabi.com/products/ms-teams-activity",
+            "homepage": "https://opensource.simtabi.com/products/vigil",
             "license": "MIT",
             "architecture": {
-              "64bit": { "url": "${base}/mta_windows_amd64.zip", "hash": "$(sha mta_windows_amd64.zip)", "bin": [["mta_windows_amd64.exe", "mta"]] },
-              "32bit": { "url": "${base}/mta_windows_386.zip", "hash": "$(sha mta_windows_386.zip)", "bin": [["mta_windows_386.exe", "mta"]] },
-              "arm64": { "url": "${base}/mta_windows_arm64.zip", "hash": "$(sha mta_windows_arm64.zip)", "bin": [["mta_windows_arm64.exe", "mta"]] }
+              "64bit": { "url": "${base}/vigil_windows_amd64.zip", "hash": "$(sha vigil_windows_amd64.zip)", "bin": [["vigil_windows_amd64.exe", "vigil"]] },
+              "32bit": { "url": "${base}/vigil_windows_386.zip", "hash": "$(sha vigil_windows_386.zip)", "bin": [["vigil_windows_386.exe", "vigil"]] },
+              "arm64": { "url": "${base}/vigil_windows_arm64.zip", "hash": "$(sha vigil_windows_arm64.zip)", "bin": [["vigil_windows_arm64.exe", "vigil"]] }
             }
           }
           EOF
-          (cd bucket && git add -A && git commit -m "mta ${VERSION}" && git push)
+          (cd bucket && git add -A && git commit -m "vigil ${VERSION}" && git push)

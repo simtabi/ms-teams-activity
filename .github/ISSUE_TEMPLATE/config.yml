@@ -4,5 +4,5 @@ contact_links:
     url: mailto:opensource@simtabi.com
     about: Please report security vulnerabilities privately, not as public issues.
   - name: Documentation
-    url: https://opensource.simtabi.com/documentation/ms-teams-activity
+    url: https://opensource.simtabi.com/documentation/vigil
     about: Product documentation.

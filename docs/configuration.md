@@ -1,27 +1,27 @@
 # Configuration
 
 Configuration is a single JSON file. Manage it with the CLI, the TUI settings
-pane (`mta` → `c`), or the guided wizard:
+pane (`vigil` → `c`), or the guided wizard:
 
 ```bash
-mta config wizard      # guided interactive setup (engine, tz, schedule, graph)
-mta config init        # write defaults
-mta config path        # print the effective path
-mta config edit        # open in $EDITOR, validated on save
-mta config validate    # check without editing
-mta config show        # print the effective config (JSON)
+vigil config wizard      # guided interactive setup (engine, tz, schedule, graph)
+vigil config init        # write defaults
+vigil config path        # print the effective path
+vigil config edit        # open in $EDITOR, validated on save
+vigil config validate    # check without editing
+vigil config show        # print the effective config (JSON)
 
 # Non-interactive get/set (dotted keys, validated before save):
-mta config keys                          # list settable keys
-mta config get input.interval_seconds
-mta config set engine both
-mta config set input.method key
+vigil config keys                          # list settable keys
+vigil config get input.interval_seconds
+vigil config set engine both
+vigil config set input.method key
 
 # Schedule windows (not part of get/set):
-mta schedule list
-mta schedule add --days Mon,Tue,Wed,Thu,Fri --start 08:00 --end 17:00
-mta schedule remove 1
-mta schedule clear
+vigil schedule list
+vigil schedule add --days Mon,Tue,Wed,Thu,Fri --start 08:00 --end 17:00
+vigil schedule remove 1
+vigil schedule clear
 ```
 
 > Setting `engine` to `graph`/`both` requires `graph.client_id` to be set first
@@ -31,11 +31,11 @@ mta schedule clear
 
 | Scope | Config | Runtime (status/override/log/token) |
 |-------|--------|-------------------------------------|
-| user (Linux/macOS) | `~/.config/ms-teams-activity/config.json` (`$XDG_CONFIG_HOME`) | `~/.local/state/ms-teams-activity/` (`$XDG_STATE_HOME`) |
-| user (Windows) | `%AppData%\ms-teams-activity\config.json` | `%LocalAppData%\ms-teams-activity\` |
-| system (Linux) | `/etc/ms-teams-activity/config.json` | `/etc/ms-teams-activity/` |
-| system (macOS) | `/Library/Application Support/ms-teams-activity/` | same |
-| system (Windows) | `C:\ProgramData\ms-teams-activity\` | same |
+| user (Linux/macOS) | `~/.config/vigil/config.json` (`$XDG_CONFIG_HOME`) | `~/.local/state/vigil/` (`$XDG_STATE_HOME`) |
+| user (Windows) | `%AppData%\vigil\config.json` | `%LocalAppData%\vigil\` |
+| system (Linux) | `/etc/vigil/config.json` | `/etc/vigil/` |
+| system (macOS) | `/Library/Application Support/vigil/` | same |
+| system (Windows) | `C:\ProgramData\vigil\` | same |
 
 > macOS deliberately uses `~/.config` / `~/.local/state` (not
 > `~/Library/Application Support`) so the locations are predictable across
@@ -97,10 +97,10 @@ mta schedule clear
 Overrides take precedence over the schedule and persist across restarts:
 
 ```bash
-mta on                 # force active, indefinitely
-mta on --for 2h30m     # force active for a duration
-mta off --until 18:00  # force inactive until the next 18:00
-mta resume             # clear the override, follow the schedule again
+vigil on                 # force active, indefinitely
+vigil on --for 2h30m     # force active for a duration
+vigil off --until 18:00  # force inactive until the next 18:00
+vigil resume             # clear the override, follow the schedule again
 ```
 
 The config is hot-reloaded; edits and overrides take effect within ~1 second
@@ -109,10 +109,10 @@ without restarting the service.
 ### Running & debugging
 
 ```bash
-mta run --dry-run      # run the loop but only log intended actions (no input/Graph)
-mta run --verbose      # debug-level logging
-mta status             # current daemon + service state (add --json for scripts)
-mta doctor             # capability/permission/Graph diagnostics
+vigil run --dry-run      # run the loop but only log intended actions (no input/Graph)
+vigil run --verbose      # debug-level logging
+vigil status             # current daemon + service state (add --json for scripts)
+vigil doctor             # capability/permission/Graph diagnostics
 ```
 
 `--dry-run` is the easiest way to watch how the schedule and overrides resolve

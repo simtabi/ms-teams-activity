@@ -1,4 +1,4 @@
-// Package service installs, controls and runs ms-teams-activity as a background
+// Package service installs, controls and runs vigil as a background
 // service. It uses kardianos/service for launchd, systemd and Windows services,
 // but on Windows the synthetic-input engine must run in the interactive user
 // session, so it is installed as a logon Scheduled Task instead of a session-0
@@ -13,12 +13,12 @@ import (
 	"time"
 
 	"github.com/kardianos/service"
-	"github.com/simtabi/ms-teams-activity/internal/config"
-	"github.com/simtabi/ms-teams-activity/internal/engine"
+	"github.com/simtabi/vigil/internal/config"
+	"github.com/simtabi/vigil/internal/engine"
 )
 
 // serviceName is the OS-level service/task identifier.
-const serviceName = "msteamsactivity"
+const serviceName = "vigil"
 
 // Params describes the target install.
 type Params struct {
@@ -50,7 +50,7 @@ func svcConfig(p Params) (*service.Config, error) {
 	}
 	cfg := &service.Config{
 		Name:        serviceName,
-		DisplayName: "MS Teams Activity",
+		DisplayName: "Vigil",
 		Description: "Keeps Microsoft Teams active on a configurable schedule.",
 		Executable:  exe,
 		Arguments:   []string{"run", "--scope", string(p.Scope), "--config", p.ConfigPath},
@@ -190,7 +190,7 @@ func postInstallHint(p Params) string {
 	case runtime.GOOS == "linux" && p.Scope == config.ScopeUser:
 		return "Tip: run `loginctl enable-linger $USER` so the service keeps running when you're logged out."
 	case runtime.GOOS == "darwin" && p.UsesInput:
-		return "Tip: grant Accessibility permission to the mta binary in System Settings → Privacy & Security → Accessibility, then run `mta doctor`."
+		return "Tip: grant Accessibility permission to the vigil binary in System Settings → Privacy & Security → Accessibility, then run `vigil doctor`."
 	default:
 		return ""
 	}

@@ -41,7 +41,7 @@ static void pressF15(void) {
 // (which also defers the screensaver/lock on most configs). Returns 0 on failure.
 static IOPMAssertionID preventDisplaySleep(void) {
     IOPMAssertionID id = 0;
-    CFStringRef reason = CFSTR("ms-teams-activity keeping session active");
+    CFStringRef reason = CFSTR("vigil keeping session active");
     IOReturn r = IOPMAssertionCreateWithName(
         kIOPMAssertionTypePreventUserIdleDisplaySleep,
         kIOPMAssertionLevelOn, reason, &id);
@@ -67,7 +67,7 @@ import (
 	"context"
 	"sync"
 
-	"github.com/simtabi/ms-teams-activity/internal/config"
+	"github.com/simtabi/vigil/internal/config"
 )
 
 const inputSupported = true

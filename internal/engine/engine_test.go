@@ -9,10 +9,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/simtabi/ms-teams-activity/internal/activity"
-	"github.com/simtabi/ms-teams-activity/internal/config"
-	"github.com/simtabi/ms-teams-activity/internal/control"
-	"github.com/simtabi/ms-teams-activity/internal/schedule"
+	"github.com/simtabi/vigil/internal/activity"
+	"github.com/simtabi/vigil/internal/config"
+	"github.com/simtabi/vigil/internal/control"
+	"github.com/simtabi/vigil/internal/schedule"
 )
 
 type fakeActivator struct {

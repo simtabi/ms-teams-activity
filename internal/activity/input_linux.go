@@ -8,7 +8,7 @@ import (
 	"sync"
 
 	"github.com/bendahl/uinput"
-	"github.com/simtabi/ms-teams-activity/internal/config"
+	"github.com/simtabi/vigil/internal/config"
 )
 
 const inputSupported = true
@@ -25,7 +25,7 @@ type linuxInput struct {
 }
 
 func newInputActivator(cfg config.InputConfig) (Activator, error) {
-	mouse, err := uinput.CreateMouse("/dev/uinput", []byte("mta-virtual-mouse"))
+	mouse, err := uinput.CreateMouse("/dev/uinput", []byte("vigil-virtual-mouse"))
 	if err != nil {
 		return nil, fmt.Errorf("create uinput virtual mouse (is /dev/uinput present and writable? add your user to a uinput group): %w", err)
 	}

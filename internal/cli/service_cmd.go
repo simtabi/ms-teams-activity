@@ -5,9 +5,9 @@ import (
 	"os"
 	"strings"
 
-	"github.com/simtabi/ms-teams-activity/internal/cli/ui"
-	"github.com/simtabi/ms-teams-activity/internal/config"
-	"github.com/simtabi/ms-teams-activity/internal/service"
+	"github.com/simtabi/vigil/internal/cli/ui"
+	"github.com/simtabi/vigil/internal/config"
+	"github.com/simtabi/vigil/internal/service"
 	"github.com/spf13/cobra"
 )
 
@@ -121,7 +121,7 @@ func simpleServiceCmd(use, short string, fn func(service.Params) error) *cobra.C
 				return err
 			}
 			if err := fn(p); err != nil {
-				return fmt.Errorf("%s failed: %w (is the service installed? run `mta install`)", use, err)
+				return fmt.Errorf("%s failed: %w (is the service installed? run `vigil install`)", use, err)
 			}
 			ui.Success("%s: ok", use)
 			return nil

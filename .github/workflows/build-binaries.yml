@@ -30,7 +30,7 @@ jobs:
           go install github.com/goreleaser/nfpm/v2/cmd/nfpm@latest
           echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
       - name: build + bundle
-        run: MTA_SCOPE=cross MTA_PACKAGES=1 MTA_CHECKSUMS=0 ./scripts/build-all.sh "${{ inputs.version }}"
+        run: VIGIL_SCOPE=cross VIGIL_PACKAGES=1 VIGIL_CHECKSUMS=0 ./scripts/build-all.sh "${{ inputs.version }}"
       - uses: actions/upload-artifact@v4
         with:
           name: dist-cross
@@ -49,7 +49,7 @@ jobs:
           go-version: '1.23'
           check-latest: true
       - name: build + bundle (arm64 + amd64 + universal)
-        run: MTA_SCOPE=darwin MTA_CHECKSUMS=0 ./scripts/build-all.sh "${{ inputs.version }}"
+        run: VIGIL_SCOPE=darwin VIGIL_CHECKSUMS=0 ./scripts/build-all.sh "${{ inputs.version }}"
       - uses: actions/upload-artifact@v4
         with:
           name: dist-darwin

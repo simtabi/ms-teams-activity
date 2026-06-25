@@ -1,4 +1,4 @@
-// Package selfupdate wraps creativeprojects/go-selfupdate to update the mta
+// Package selfupdate wraps creativeprojects/go-selfupdate to update the vigil
 // binary from its GitHub releases, with checksum validation. Channel detection
 // and service stop/restart orchestration live with the caller (internal/cli).
 package selfupdate
@@ -15,7 +15,7 @@ import (
 )
 
 // Slug is the GitHub owner/repo releases are pulled from.
-const Slug = "simtabi/ms-teams-activity"
+const Slug = "simtabi/vigil"
 
 // ErrDevVersion is returned when self-update is attempted on a dev build.
 var ErrDevVersion = errors.New("this is a development build; self-update only works on released versions")

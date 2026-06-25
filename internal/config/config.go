@@ -1,4 +1,4 @@
-// Package config defines the on-disk JSON configuration for ms-teams-activity,
+// Package config defines the on-disk JSON configuration for vigil,
 // along with defaults, validation and atomic load/save helpers.
 package config
 

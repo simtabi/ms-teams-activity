@@ -5,8 +5,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/simtabi/ms-teams-activity/internal/config"
-	"github.com/simtabi/ms-teams-activity/internal/graph"
+	"github.com/simtabi/vigil/internal/config"
+	"github.com/simtabi/vigil/internal/graph"
 )
 
 // graphActivator keeps a sticky preferred presence via Microsoft Graph. It

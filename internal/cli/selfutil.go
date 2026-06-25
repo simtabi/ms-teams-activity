@@ -6,24 +6,24 @@ import (
 	"path/filepath"
 	"runtime"
 
-	"github.com/simtabi/ms-teams-activity/internal/cli/ui"
-	"github.com/simtabi/ms-teams-activity/internal/config"
-	"github.com/simtabi/ms-teams-activity/internal/service"
+	"github.com/simtabi/vigil/internal/cli/ui"
+	"github.com/simtabi/vigil/internal/config"
+	"github.com/simtabi/vigil/internal/service"
 )
 
 // binName is the platform binary filename.
 func binName() string {
 	if runtime.GOOS == "windows" {
-		return "mta.exe"
+		return "vigil.exe"
 	}
-	return "mta"
+	return "vigil"
 }
 
 // binInstallDir returns the directory `self install` copies the binary into.
 func binInstallDir(s config.Scope) (string, error) {
 	if runtime.GOOS == "windows" {
 		if s == config.ScopeSystem {
-			return filepath.Join(os.Getenv("ProgramFiles"), "mta"), nil
+			return filepath.Join(os.Getenv("ProgramFiles"), "vigil"), nil
 		}
 		base := os.Getenv("LOCALAPPDATA")
 		if base == "" {
@@ -33,7 +33,7 @@ func binInstallDir(s config.Scope) (string, error) {
 			}
 			base = home
 		}
-		return filepath.Join(base, "Programs", "mta"), nil
+		return filepath.Join(base, "Programs", "vigil"), nil
 	}
 	if s == config.ScopeSystem {
 		return "/usr/local/bin", nil
@@ -92,6 +92,6 @@ func tccReminderIfNeeded() {
 		return
 	}
 	if cfg, err := loadConfig(); err == nil && cfg.UsesInput() {
-		ui.Warn("the binary changed — macOS may require re-granting Accessibility (System Settings → Privacy & Security → Accessibility). Run `mta doctor` to confirm.")
+		ui.Warn("the binary changed — macOS may require re-granting Accessibility (System Settings → Privacy & Security → Accessibility). Run `vigil doctor` to confirm.")
 	}
 }

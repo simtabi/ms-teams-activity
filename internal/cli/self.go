@@ -6,10 +6,10 @@ import (
 	"os"
 	"runtime"
 
-	"github.com/simtabi/ms-teams-activity/internal/cli/ui"
-	"github.com/simtabi/ms-teams-activity/internal/config"
-	"github.com/simtabi/ms-teams-activity/internal/selfupdate"
-	"github.com/simtabi/ms-teams-activity/internal/service"
+	"github.com/simtabi/vigil/internal/cli/ui"
+	"github.com/simtabi/vigil/internal/config"
+	"github.com/simtabi/vigil/internal/selfupdate"
+	"github.com/simtabi/vigil/internal/service"
 	"github.com/spf13/cobra"
 )
 
@@ -20,19 +20,19 @@ var (
 
 var upgradeCmd = &cobra.Command{
 	Use:     "upgrade",
-	Short:   "Update mta to the latest release (alias of `self update`)",
-	Example: "  mta upgrade --check\n  mta upgrade --yes",
+	Short:   "Update vigil to the latest release (alias of `self update`)",
+	Example: "  vigil upgrade --check\n  vigil upgrade --yes",
 	RunE:    func(_ *cobra.Command, _ []string) error { return doUpgrade() },
 }
 
 var selfCmd = &cobra.Command{
 	Use:   "self",
-	Short: "Manage the mta binary itself (update/install/uninstall)",
+	Short: "Manage the vigil binary itself (update/install/uninstall)",
 }
 
 var selfUpdateCmd = &cobra.Command{
 	Use:   "update",
-	Short: "Update mta to the latest release",
+	Short: "Update vigil to the latest release",
 	RunE:  func(_ *cobra.Command, _ []string) error { return doUpgrade() },
 }
 
@@ -44,7 +44,7 @@ var selfInstallCmd = &cobra.Command{
 
 var selfUninstallCmd = &cobra.Command{
 	Use:   "uninstall",
-	Short: "Remove the service and the mta binary (--purge also deletes config/data)",
+	Short: "Remove the service and the vigil binary (--purge also deletes config/data)",
 	RunE:  func(_ *cobra.Command, _ []string) error { return doSelfUninstall() },
 }
 
@@ -71,7 +71,7 @@ func doUpgrade() error {
 	}
 
 	if selfupdate.IsDev(version) {
-		return fmt.Errorf("%w (use a released build, or `mta upgrade --check`)", selfupdate.ErrDevVersion)
+		return fmt.Errorf("%w (use a released build, or `vigil upgrade --check`)", selfupdate.ErrDevVersion)
 	}
 	if !ch.SelfUpdatable() {
 		return fmt.Errorf("not self-updating: %s", ch.Advice())
@@ -161,13 +161,13 @@ func doSelfInstall() error {
 		return err
 	}
 	ui.Success("installed: %s", dst)
-	ui.Info("ensure %s is on your PATH, then run `mta config wizard` and `mta install`.", dir)
+	ui.Info("ensure %s is on your PATH, then run `vigil config wizard` and `vigil install`.", dir)
 	tccReminderIfNeeded()
 	return nil
 }
 
 func doSelfUninstall() error {
-	if !ui.Confirm("Remove the mta service and binary?", false) {
+	if !ui.Confirm("Remove the vigil service and binary?", false) {
 		ui.Info("cancelled")
 		return nil
 	}

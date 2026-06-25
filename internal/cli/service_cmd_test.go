@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/simtabi/ms-teams-activity/internal/config"
+	"github.com/simtabi/vigil/internal/config"
 )
 
 func TestEnsureConfig(t *testing.T) {
@@ -29,7 +29,7 @@ func TestAlreadyInstalled(t *testing.T) {
 	if !alreadyInstalled(errors.New("Init already exists")) {
 		t.Error("should detect 'already exists'")
 	}
-	if !alreadyInstalled(errors.New("service mta already installed")) {
+	if !alreadyInstalled(errors.New("service vigil already installed")) {
 		t.Error("should detect 'already installed'")
 	}
 	if alreadyInstalled(errors.New("permission denied")) {

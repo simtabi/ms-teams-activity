@@ -6,7 +6,7 @@ import (
 )
 
 // dryActivator performs no real action; it only logs what it would do. Used by
-// `mta run --dry-run` to observe scheduling/engine behavior without injecting
+// `vigil run --dry-run` to observe scheduling/engine behavior without injecting
 // input, holding power assertions, or calling Graph.
 type dryActivator struct {
 	engine string

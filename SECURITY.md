@@ -11,7 +11,7 @@ business days.
 
 ## Scope notes
 
-`ms-teams-activity` stores a Microsoft Graph token cache on disk (mode `0600`)
+`vigil` stores a Microsoft Graph token cache on disk (mode `0600`)
 when the `graph` engine is used, and writes runtime status/override files under
 the user cache directory. The synthetic-input engine injects local input events
 and, on macOS, holds a power assertion. There is no network listener by default

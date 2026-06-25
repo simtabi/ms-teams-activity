@@ -1,7 +1,7 @@
 # Release process
 
 Releases are tag-driven. The git tag is the single source of version truth;
-`mta version` is stamped at build time via ldflags
+`vigil version` is stamped at build time via ldflags
 (`internal/cli.version/commit/date`).
 
 ## Cutting a release
@@ -30,18 +30,18 @@ all archives and packages grouped under `dist/archives/`:
 
 ```
 dist/
-  mta_<os>_<arch>[.exe]      # bare, self-describing binaries (macOS uses "macos"; + mta_macos_universal)
+  vigil_<os>_<arch>[.exe]      # bare, self-describing binaries (macOS uses "macos"; + vigil_macos_universal)
   checksums.txt              # sha256 over the bare binaries
   archives/
-    mta_<os>_<arch>.tar.gz   # unix; the inner binary KEEPS the flat name
-    mta_windows_<arch>.zip   # windows; inner mta_windows_<arch>.exe
-    mta_<arch>.deb / .rpm    # nfpm (build/nfpm.yaml)
+    vigil_<os>_<arch>.tar.gz   # unix; the inner binary KEEPS the flat name
+    vigil_windows_<arch>.zip   # windows; inner vigil_windows_<arch>.exe
+    vigil_<arch>.deb / .rpm    # nfpm (build/nfpm.yaml)
     checksums.txt            # sha256 over archives/packages
 ```
 
-Archive names are **version-less** (`mta_<os>_<arch>.{tar.gz,zip}`) to keep the
+Archive names are **version-less** (`vigil_<os>_<arch>.{tar.gz,zip}`) to keep the
 self-update contract stable. macOS ships a **universal** binary
-(`mta_macos_universal`, Apple Silicon + Intel). GitHub release assets = the
+(`vigil_macos_universal`, Apple Silicon + Intel). GitHub release assets = the
 contents of `dist/archives/`. macOS artifacts use the `macos` token (Go's
 `darwin` is hard to recognize); self-update sets the updater's OS to `macos`
 accordingly.
@@ -70,9 +70,9 @@ make dist          # build + bundle everything the local toolchain supports
 
 ## Self-update contract
 
-`internal/selfupdate` downloads `mta_<os>_<arch>.<ext>` and validates it against
+`internal/selfupdate` downloads `vigil_<os>_<arch>.<ext>` and validates it against
 `checksums.txt`. The inner binary keeps the **flat** name
-(`mta_<os>_<arch>[.exe]`), which `go-selfupdate`'s `matchExecutableName` accepts
+(`vigil_<os>_<arch>[.exe]`), which `go-selfupdate`'s `matchExecutableName` accepts
 (`^cmd([_-]v?semver)?([_-]os[_-]arch)?(\.exe)?$`). Keep these aligned: the
 archive name, the flat inner-binary name, **bare-filename** `checksums.txt`, and
 `vX.Y.Z` tags. Changing one side means changing both.

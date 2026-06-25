@@ -6,6 +6,22 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-06-25
+
+### Changed
+- **Renamed the project to `vigil`.** The binary is now `vigil` (was `mta`), the
+  Go module is `github.com/simtabi/vigil`, the service identifier/display name are
+  `vigil`/`Vigil`, and all config/runtime directories use `vigil`
+  (`~/.config/vigil`, `~/.local/state/vigil`; `%AppData%\vigil` etc.). Release
+  artifacts are now `vigil_<os>_<arch>`.
+
+### Upgrade notes
+- This is effectively a fresh install. From a `0.3.x` (`mta`) install: remove the
+  old service first (`mta uninstall`, or `mta self uninstall --purge`), then
+  install `vigil` and re-run `vigil config wizard` (config does not migrate from
+  `ms-teams-activity` automatically). For the Graph engine, `vigil auth login`
+  again. `mta upgrade` cannot cross the rename — install vigil fresh.
+
 ## [0.3.1] - 2026-06-24
 
 ### Fixed
@@ -183,14 +199,15 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   `doctor`, `version`) and a Bubble Tea TUI dashboard.
 - `doctor` diagnostics for permissions, capabilities, and configuration.
 
-[Unreleased]: https://github.com/simtabi/ms-teams-activity/compare/v0.3.1...HEAD
-[0.3.1]: https://github.com/simtabi/ms-teams-activity/releases/tag/v0.3.1
-[0.3.0]: https://github.com/simtabi/ms-teams-activity/releases/tag/v0.3.0
-[0.2.3]: https://github.com/simtabi/ms-teams-activity/releases/tag/v0.2.3
-[0.2.2]: https://github.com/simtabi/ms-teams-activity/releases/tag/v0.2.2
-[0.2.1]: https://github.com/simtabi/ms-teams-activity/releases/tag/v0.2.1
-[0.2.0]: https://github.com/simtabi/ms-teams-activity/releases/tag/v0.2.0
-[0.1.3]: https://github.com/simtabi/ms-teams-activity/releases/tag/v0.1.3
-[0.1.2]: https://github.com/simtabi/ms-teams-activity/releases/tag/v0.1.2
-[0.1.1]: https://github.com/simtabi/ms-teams-activity/releases/tag/v0.1.1
-[0.1.0]: https://github.com/simtabi/ms-teams-activity/releases/tag/v0.1.0
+[Unreleased]: https://github.com/simtabi/vigil/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/simtabi/vigil/releases/tag/v0.4.0
+[0.3.1]: https://github.com/simtabi/vigil/releases/tag/v0.3.1
+[0.3.0]: https://github.com/simtabi/vigil/releases/tag/v0.3.0
+[0.2.3]: https://github.com/simtabi/vigil/releases/tag/v0.2.3
+[0.2.2]: https://github.com/simtabi/vigil/releases/tag/v0.2.2
+[0.2.1]: https://github.com/simtabi/vigil/releases/tag/v0.2.1
+[0.2.0]: https://github.com/simtabi/vigil/releases/tag/v0.2.0
+[0.1.3]: https://github.com/simtabi/vigil/releases/tag/v0.1.3
+[0.1.2]: https://github.com/simtabi/vigil/releases/tag/v0.1.2
+[0.1.1]: https://github.com/simtabi/vigil/releases/tag/v0.1.1
+[0.1.0]: https://github.com/simtabi/vigil/releases/tag/v0.1.0

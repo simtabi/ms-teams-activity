@@ -6,8 +6,8 @@ import (
 	"os/exec"
 	"runtime"
 
-	"github.com/simtabi/ms-teams-activity/internal/cli/ui"
-	"github.com/simtabi/ms-teams-activity/internal/config"
+	"github.com/simtabi/vigil/internal/cli/ui"
+	"github.com/simtabi/vigil/internal/config"
 	"github.com/spf13/cobra"
 )
 
@@ -90,7 +90,7 @@ var configEditCmd = &cobra.Command{
 			return err
 		}
 		if _, err := os.Stat(p); os.IsNotExist(err) {
-			return fmt.Errorf("no config at %s — run `mta config init` first", p)
+			return fmt.Errorf("no config at %s — run `vigil config init` first", p)
 		}
 		editor := os.Getenv("EDITOR")
 		if editor == "" {

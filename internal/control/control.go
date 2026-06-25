@@ -19,7 +19,7 @@ const (
 	StatusFile   = "status.json"
 	OverrideFile = "override.json"
 	LockFile     = "daemon.lock"
-	LogFile      = "mta.log"
+	LogFile      = "vigil.log"
 )
 
 // Status is the daemon's published state, read by `status` and the TUI.

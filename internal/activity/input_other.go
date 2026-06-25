@@ -5,7 +5,7 @@ package activity
 import (
 	"errors"
 
-	"github.com/simtabi/ms-teams-activity/internal/config"
+	"github.com/simtabi/vigil/internal/config"
 )
 
 const inputSupported = false

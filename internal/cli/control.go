@@ -5,11 +5,11 @@ import (
 	"os"
 	"time"
 
-	"github.com/simtabi/ms-teams-activity/internal/cli/ui"
-	"github.com/simtabi/ms-teams-activity/internal/config"
-	"github.com/simtabi/ms-teams-activity/internal/control"
-	"github.com/simtabi/ms-teams-activity/internal/schedule"
-	"github.com/simtabi/ms-teams-activity/internal/service"
+	"github.com/simtabi/vigil/internal/cli/ui"
+	"github.com/simtabi/vigil/internal/config"
+	"github.com/simtabi/vigil/internal/control"
+	"github.com/simtabi/vigil/internal/schedule"
+	"github.com/simtabi/vigil/internal/service"
 	"github.com/spf13/cobra"
 )
 
@@ -87,7 +87,7 @@ func setOverride(mode schedule.OverrideMode) error {
 	if ov.Until != nil {
 		ui.Success("override %s until %s", mode, ov.Until.Format("Mon 15:04"))
 	} else {
-		ui.Success("override %s (indefinite; `mta resume` to clear)", mode)
+		ui.Success("override %s (indefinite; `vigil resume` to clear)", mode)
 	}
 	return nil
 }

@@ -37,7 +37,7 @@ web/PWA, which may apply its own tab-level idle in addition to OS idle.
 `IOPMAssertion` to defer display sleep. Two caveats:
 
 1. **Accessibility permission is required** for `CGEventPost` to take effect —
-   grant it to the `mta` binary and verify with `mta doctor`.
+   grant it to the `vigil` binary and verify with `vigil doctor`.
 2. **Synthetic events do not reset the hardware idle timer.** Teams usually
    reads the synthetic-aware combined-session idle (so it stays green), but the
    screensaver/auto-lock uses the hardware timer. If auto-lock fires, Teams goes

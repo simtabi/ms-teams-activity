@@ -6,10 +6,10 @@ import (
 	"os"
 	"strings"
 
-	"github.com/simtabi/ms-teams-activity/internal/config"
-	"github.com/simtabi/ms-teams-activity/internal/control"
-	"github.com/simtabi/ms-teams-activity/internal/engine"
-	"github.com/simtabi/ms-teams-activity/internal/service"
+	"github.com/simtabi/vigil/internal/config"
+	"github.com/simtabi/vigil/internal/control"
+	"github.com/simtabi/vigil/internal/engine"
+	"github.com/simtabi/vigil/internal/service"
 	"github.com/spf13/cobra"
 	"gopkg.in/natefinch/lumberjack.v2"
 )

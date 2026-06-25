@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/simtabi/ms-teams-activity/internal/cli/ui"
-	"github.com/simtabi/ms-teams-activity/internal/config"
-	"github.com/simtabi/ms-teams-activity/internal/graph"
+	"github.com/simtabi/vigil/internal/cli/ui"
+	"github.com/simtabi/vigil/internal/config"
+	"github.com/simtabi/vigil/internal/graph"
 	"github.com/spf13/cobra"
 )
 
@@ -62,7 +62,7 @@ var authStatusCmd = &cobra.Command{
 			return printJSON(map[string]any{"account": acct, "signed_in": acct != ""})
 		}
 		if acct == "" {
-			fmt.Println("not signed in (run `mta auth login`)")
+			fmt.Println("not signed in (run `vigil auth login`)")
 			return nil
 		}
 		fmt.Printf("signed in as %s\n", acct)

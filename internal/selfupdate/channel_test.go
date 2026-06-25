@@ -7,17 +7,17 @@ func TestDetectChannel(t *testing.T) {
 		path string
 		want Channel
 	}{
-		{"/opt/homebrew/bin/mta", Homebrew},
-		{"/usr/local/Cellar/mta/0.1.0/bin/mta", Homebrew},
-		{`C:\Users\me\scoop\apps\mta\current\mta.exe`, Scoop},
-		{"/usr/bin/mta", SystemPackage},
-		{"/bin/mta", SystemPackage},
-		{"/home/me/.local/bin/mta", Standalone},
-		{"/usr/local/bin/mta", Standalone},
-		{`C:\Tools\mta\mta.exe`, Standalone},
+		{"/opt/homebrew/bin/vigil", Homebrew},
+		{"/usr/local/Cellar/vigil/0.1.0/bin/vigil", Homebrew},
+		{`C:\Users\me\scoop\apps\vigil\current\vigil.exe`, Scoop},
+		{"/usr/bin/vigil", SystemPackage},
+		{"/bin/vigil", SystemPackage},
+		{"/home/me/.local/bin/vigil", Standalone},
+		{"/usr/local/bin/vigil", Standalone},
+		{`C:\Tools\vigil\vigil.exe`, Standalone},
 		// "scoop" only as a substring (not a path segment) must NOT match.
-		{`C:\dev\scoopproject\bin\mta.exe`, Standalone},
-		{"/home/me/scooponics/mta", Standalone},
+		{`C:\dev\scoopproject\bin\vigil.exe`, Standalone},
+		{"/home/me/scooponics/vigil", Standalone},
 	}
 	for _, tc := range cases {
 		if got := DetectChannel(tc.path); got != tc.want {

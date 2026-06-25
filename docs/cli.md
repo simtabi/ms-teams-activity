@@ -1,6 +1,6 @@
 # CLI conventions
 
-`mta` follows common command-line conventions so it behaves predictably in
+`vigil` follows common command-line conventions so it behaves predictably in
 scripts, pipelines, and CI as well as interactively.
 
 ## Output streams
@@ -37,8 +37,8 @@ Destructive or state-changing commands ask before acting, with a **safe default*
   commands never hang waiting for input in a pipeline.
 
 ```bash
-mta uninstall --yes              # no prompt; remove the service
-mta self uninstall --no-input    # safe: declines (default is no), so nothing is removed
+vigil uninstall --yes              # no prompt; remove the service
+vigil self uninstall --no-input    # safe: declines (default is no), so nothing is removed
 ```
 
 ## Color

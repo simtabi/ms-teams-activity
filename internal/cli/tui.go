@@ -1,7 +1,7 @@
 package cli
 
 import (
-	"github.com/simtabi/ms-teams-activity/tui"
+	"github.com/simtabi/vigil/tui"
 	"github.com/spf13/cobra"
 )
 

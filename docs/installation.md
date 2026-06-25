@@ -4,14 +4,14 @@
 
 | Method | Command |
 |--------|---------|
-| Install script (macOS/Linux) | `curl -fsSL https://raw.githubusercontent.com/simtabi/ms-teams-activity/main/scripts/install.sh \| sh` |
-| Install script (Windows) | `irm https://raw.githubusercontent.com/simtabi/ms-teams-activity/main/scripts/install.ps1 \| iex` |
-| Homebrew | `brew install simtabi/tap/mta` |
-| Scoop | `scoop bucket add simtabi https://github.com/simtabi/scoop-bucket; scoop install mta` |
-| deb/rpm | download from releases, `sudo dpkg -i mta_*.deb` / `sudo rpm -i mta_*.rpm` |
-| go install | `go install github.com/simtabi/ms-teams-activity/cmd/mta@latest` |
-| Prebuilt archive | download `mta_<os>_<arch>.{tar.gz,zip}` from the releases page |
-| From source | `go build -o mta ./cmd/mta` |
+| Install script (macOS/Linux) | `curl -fsSL https://raw.githubusercontent.com/simtabi/vigil/main/scripts/install.sh \| sh` |
+| Install script (Windows) | `irm https://raw.githubusercontent.com/simtabi/vigil/main/scripts/install.ps1 \| iex` |
+| Homebrew | `brew install simtabi/tap/vigil` |
+| Scoop | `scoop bucket add simtabi https://github.com/simtabi/scoop-bucket; scoop install vigil` |
+| deb/rpm | download from releases, `sudo dpkg -i vigil_*.deb` / `sudo rpm -i vigil_*.rpm` |
+| go install | `go install github.com/simtabi/vigil/cmd/vigil@latest` |
+| Prebuilt archive | download `vigil_<os>_<arch>.{tar.gz,zip}` from the releases page |
+| From source | `go build -o vigil ./cmd/vigil` |
 
 The install scripts download the prebuilt binary and **verify its SHA-256**
 against the release `checksums.txt`, falling back to a source build if the
@@ -29,9 +29,9 @@ self-describing binaries; all archives + deb/rpm are grouped under
 
 ```
 dist/
-  mta_macos_arm64   mta_linux_amd64   mta_windows_amd64.exe   mta_macos_universal   …
+  vigil_macos_arm64   vigil_linux_amd64   vigil_windows_amd64.exe   vigil_macos_universal   …
   checksums.txt
-  archives/  mta_<os>_<arch>.tar.gz · mta_windows_<arch>.zip · *.deb · *.rpm · checksums.txt
+  archives/  vigil_<os>_<arch>.tar.gz · vigil_windows_<arch>.zip · *.deb · *.rpm · checksums.txt
 ```
 
 It builds whatever your local toolchain supports (macOS targets need a C
@@ -41,18 +41,18 @@ latest run's Artifacts.
 
 ## Putting the binary on PATH
 
-`mta self install` copies the running binary to a standard location
+`vigil self install` copies the running binary to a standard location
 (`~/.local/bin`, `/usr/local/bin` with `--scope system`, or
-`%LOCALAPPDATA%\Programs\mta` on Windows). `mta self uninstall [--purge]`
+`%LOCALAPPDATA%\Programs\vigil` on Windows). `vigil self uninstall [--purge]`
 removes the service and the binary (and, with `--purge`, config + data).
 
 ## First run
 
 ```bash
-mta config wizard   # guided setup (or: mta config init for defaults)
-mta doctor          # verify capabilities and permissions
-mta install         # install + start the background service
-mta status          # check service + daemon state
+vigil config wizard   # guided setup (or: vigil config init for defaults)
+vigil doctor          # verify capabilities and permissions
+vigil install         # install + start the background service
+vigil status          # check service + daemon state
 ```
 
 ## Daemon lifecycle
@@ -62,9 +62,9 @@ right per-OS mechanism — launchd / systemd / Windows service / Windows logon
 task):
 
 ```bash
-mta install --init   # turnkey: write a default config if missing, then install + start
-mta start | stop | restart | status
-mta uninstall        # stop + remove the service (keeps the binary)
+vigil install --init   # turnkey: write a default config if missing, then install + start
+vigil start | stop | restart | status
+vigil uninstall        # stop + remove the service (keeps the binary)
 ```
 
 The install scripts can do the whole thing in one shot with `--with-service`
@@ -72,16 +72,16 @@ The install scripts can do the whole thing in one shot with `--with-service`
 
 ```bash
 # macOS/Linux
-curl -fsSL https://raw.githubusercontent.com/simtabi/ms-teams-activity/main/scripts/uninstall.sh | sh
+curl -fsSL https://raw.githubusercontent.com/simtabi/vigil/main/scripts/uninstall.sh | sh
 curl -fsSL .../scripts/uninstall.sh | sh -s -- --purge   # also delete config + runtime data
 
 # Windows (piped form can't pass flags)
-irm https://raw.githubusercontent.com/simtabi/ms-teams-activity/main/scripts/uninstall.ps1 | iex
+irm https://raw.githubusercontent.com/simtabi/vigil/main/scripts/uninstall.ps1 | iex
 ./scripts/uninstall.ps1 -Purge                            # local file: also delete config + data
 
 # Or directly, on any OS:
-mta self uninstall            # service + binary
-mta self uninstall --purge    # also config + runtime data
+vigil self uninstall            # service + binary
+vigil self uninstall --purge    # also config + runtime data
 ```
 
 `--purge` (and `-Purge`) additionally delete the config and runtime/state
@@ -93,7 +93,7 @@ directories; without it, those are left in place.
 session. `--scope system` installs a machine-wide service.
 
 **The input engine requires a desktop (GUI) session**, so it must be installed
-with `--scope user`. `mta install` refuses `input` + `--scope system`. A
+with `--scope user`. `vigil install` refuses `input` + `--scope system`. A
 system-wide service is appropriate for the `graph` engine, which is headless.
 
 ## Per-OS service mechanism
@@ -106,10 +106,10 @@ system-wide service is appropriate for the `graph` engine, which is headless.
 
 ## Platform prerequisites
 
-- **macOS** — grant the `mta` binary **Accessibility** permission
+- **macOS** — grant the `vigil` binary **Accessibility** permission
   (System Settings → Privacy & Security → Accessibility). Because TCC keys on
   the binary's signature, re-grant after rebuilding an unsigned binary. Run
-  `mta doctor` to confirm. Synthetic input cannot reset the *hardware* idle
+  `vigil doctor` to confirm. Synthetic input cannot reset the *hardware* idle
   timer, so disable or lengthen auto-lock to stay Available.
 - **Linux** — `/dev/uinput` must exist (`sudo modprobe uinput`) and be writable
   by your user. Add a udev rule / group so the device is accessible without

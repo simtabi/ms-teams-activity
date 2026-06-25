@@ -1,4 +1,4 @@
-module github.com/simtabi/ms-teams-activity
+module github.com/simtabi/vigil
 
 go 1.25.0
 

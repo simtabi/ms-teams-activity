@@ -23,7 +23,7 @@ const graphBase = "https://graph.microsoft.com/v1.0"
 
 // ErrLoginRequired is returned when no cached account can produce a token
 // silently and an interactive `auth login` is needed.
-var ErrLoginRequired = errors.New("graph: login required (run `mta auth login`)")
+var ErrLoginRequired = errors.New("graph: login required (run `vigil auth login`)")
 
 // Client authenticates against Entra ID and calls the presence endpoints.
 type Client struct {
