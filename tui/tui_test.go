@@ -340,6 +340,34 @@ func TestSettingsCycleAndClamp(t *testing.T) {
 	if m.edit.Input.PreventSleep == ps {
 		t.Fatal("prevent_sleep should toggle")
 	}
+	// jitter can never exceed interval-1 (config.Validate requires jitter < interval).
+	m.setRow = rowInterval
+	for i := 0; i < 50; i++ {
+		m = press(m, "-")
+	}
+	m.setRow = rowJitter
+	for i := 0; i < 100; i++ {
+		m = press(m, "+")
+	}
+	if m.edit.Input.JitterSeconds >= m.edit.Input.IntervalSeconds {
+		t.Fatalf("jitter %d must stay below interval %d", m.edit.Input.JitterSeconds, m.edit.Input.IntervalSeconds)
+	}
+}
+
+func TestOverrideTimedOff(t *testing.T) {
+	m := newModel(testOpts(t, true))
+	ovrPath := control.OverridePath(m.opts.RuntimeDir)
+	idx := overrideIndex("off", time.Hour)
+	if idx < 0 {
+		t.Fatal("expected a 1-hour force-inactive preset")
+	}
+	m.screen = screenOverride
+	m.subCursor = idx
+	m = press(m, "enter")
+	ov, _ := schedule.LoadOverride(ovrPath)
+	if ov.Mode != schedule.OverrideOff || ov.Until == nil {
+		t.Fatalf("timed off should set mode off + Until; got mode=%q until=%v", ov.Mode, ov.Until)
+	}
 }
 
 func TestSettingsSaveInvalidGraphStays(t *testing.T) {

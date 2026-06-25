@@ -71,13 +71,21 @@ The install scripts can do the whole thing in one shot with `--with-service`
 (`-WithService` on Windows). To remove everything later:
 
 ```bash
-# macOS/Linux  (append `-s -- --purge` to also delete config + runtime data)
+# macOS/Linux
 curl -fsSL https://raw.githubusercontent.com/simtabi/ms-teams-activity/main/scripts/uninstall.sh | sh
-# Windows
+curl -fsSL .../scripts/uninstall.sh | sh -s -- --purge   # also delete config + runtime data
+
+# Windows (piped form can't pass flags)
 irm https://raw.githubusercontent.com/simtabi/ms-teams-activity/main/scripts/uninstall.ps1 | iex
-# or, directly:
-mta self uninstall --purge
+./scripts/uninstall.ps1 -Purge                            # local file: also delete config + data
+
+# Or directly, on any OS:
+mta self uninstall            # service + binary
+mta self uninstall --purge    # also config + runtime data
 ```
+
+`--purge` (and `-Purge`) additionally delete the config and runtime/state
+directories; without it, those are left in place.
 
 ## Scope: user vs system
 

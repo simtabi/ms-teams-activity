@@ -6,6 +6,36 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.3.1] - 2026-06-24
+
+### Fixed
+- **Self-update never downgrades**: `mta upgrade` now only replaces the binary
+  when the release is strictly newer, and reports "already up to date" instead of
+  a false "updated" on a no-op.
+- **Install-channel detection** no longer treats any path *containing* "scoop"
+  (e.g. `…/scoopproject/…`) as Scoop-managed; it matches a real path segment, so
+  standalone binaries in such paths can still self-update.
+- **Windows sleep-prevention assertion**: the daemon goroutine is pinned to its
+  OS thread, so the thread-affine `SetThreadExecutionState` is set and cleared on
+  the same thread and never leaks after deactivation/shutdown.
+- `self install`/`self update` no longer leave a partial `*.tmp` file behind when
+  a copy fails.
+- TUI Settings clamps **jitter below the interval**, so you can no longer set a
+  value that fails validation on save.
+- `doctor` now emits a warning (instead of silently dropping the row) when the
+  macOS screensaver idle time can't be parsed, and doesn't compare against a
+  zero interval when the config failed to load.
+
+### Added
+- TUI Override menu offers timed "Force inactive" presets (1h / 2h / 4h),
+  matching the CLI's `off --for` and the existing "Force active" presets.
+- `mta upgrade --check --json` now reports the install `channel` name (string)
+  plus a `self_updatable` boolean.
+
+### Documentation
+- Documented `--purge` / `-Purge` usage for the uninstall scripts and the
+  one-hour DST-changeover-day caveat for overnight schedule windows.
+
 ## [0.3.0] - 2026-06-24
 
 ### Added
@@ -153,7 +183,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   `doctor`, `version`) and a Bubble Tea TUI dashboard.
 - `doctor` diagnostics for permissions, capabilities, and configuration.
 
-[Unreleased]: https://github.com/simtabi/ms-teams-activity/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/simtabi/ms-teams-activity/compare/v0.3.1...HEAD
+[0.3.1]: https://github.com/simtabi/ms-teams-activity/releases/tag/v0.3.1
 [0.3.0]: https://github.com/simtabi/ms-teams-activity/releases/tag/v0.3.0
 [0.2.3]: https://github.com/simtabi/ms-teams-activity/releases/tag/v0.2.3
 [0.2.2]: https://github.com/simtabi/ms-teams-activity/releases/tag/v0.2.2

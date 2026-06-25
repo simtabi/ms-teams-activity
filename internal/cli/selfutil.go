@@ -60,6 +60,8 @@ func copyFile(src, dst string, perm os.FileMode) error {
 	if err != nil {
 		return err
 	}
+	// Clean up the partial temp file on any failure (no-op after a successful rename).
+	defer func() { _ = os.Remove(tmp) }()
 	if _, err := io.Copy(out, in); err != nil {
 		_ = out.Close()
 		return err

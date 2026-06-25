@@ -273,7 +273,10 @@ var overrideItems = []struct {
 	{"on", time.Hour, "Force active — 1 hour"},
 	{"on", 2 * time.Hour, "Force active — 2 hours"},
 	{"on", 4 * time.Hour, "Force active — 4 hours"},
-	{"off", 0, "Force inactive"},
+	{"off", 0, "Force inactive — indefinite"},
+	{"off", time.Hour, "Force inactive — 1 hour"},
+	{"off", 2 * time.Hour, "Force inactive — 2 hours"},
+	{"off", 4 * time.Hour, "Force inactive — 4 hours"},
 	{"resume", 0, "Resume schedule"},
 	{"back", 0, "Back"},
 }

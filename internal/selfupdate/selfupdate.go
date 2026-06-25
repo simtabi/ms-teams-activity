@@ -83,8 +83,20 @@ func Apply(ctx context.Context, current string) (Info, error) {
 	if err != nil {
 		return Info{}, err
 	}
-	rel, err := up.UpdateCommand(ctx, exe, current, repository())
+	rel, found, err := up.DetectLatest(ctx, repository())
 	if err != nil {
+		return Info{}, err
+	}
+	// Only replace the binary when the release is strictly newer — never downgrade
+	// to a re-tagged or yanked "latest", and report Available honestly.
+	if !found || rel == nil || !rel.GreaterThan(current) {
+		latest := ""
+		if rel != nil {
+			latest = rel.Version()
+		}
+		return Info{Current: current, Latest: latest, Available: false}, nil
+	}
+	if err := up.UpdateTo(ctx, rel, exe); err != nil {
 		return Info{}, err
 	}
 	return Info{Current: current, Latest: rel.Version(), Available: true, Notes: rel.ReleaseNotes}, nil

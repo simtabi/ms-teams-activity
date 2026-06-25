@@ -116,6 +116,10 @@ func doUpgrade() error {
 	if applyErr != nil {
 		return applyErr
 	}
+	if !applied.Available {
+		ui.Info("already up to date (%s)", version)
+		return nil
+	}
 	ui.Success("updated to %s", applied.Latest)
 	tccReminderIfNeeded()
 	return nil
@@ -125,7 +129,8 @@ func printCheck(info selfupdate.Info, ch selfupdate.Channel) {
 	if flagJSON {
 		_ = printJSON(map[string]any{
 			"current": info.Current, "latest": info.Latest,
-			"available": info.Available, "channel": ch.SelfUpdatable(),
+			"available": info.Available, "channel": ch.String(),
+			"self_updatable": ch.SelfUpdatable(),
 		})
 		return
 	}

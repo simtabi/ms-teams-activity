@@ -24,12 +24,26 @@ func DetectChannel(exePath string) Channel {
 	switch {
 	case strings.Contains(p, "/cellar/") || strings.Contains(p, "/homebrew/") || strings.Contains(p, "/.linuxbrew/"):
 		return Homebrew
-	case strings.Contains(p, "scoop"):
+	case strings.Contains(p, `\scoop\`) || strings.Contains(p, "/scoop/"):
 		return Scoop
 	case strings.HasPrefix(p, "/usr/bin/") || strings.HasPrefix(p, "/bin/"):
 		return SystemPackage
 	default:
 		return Standalone
+	}
+}
+
+// String returns the channel's identifier (for JSON output).
+func (c Channel) String() string {
+	switch c {
+	case Homebrew:
+		return "homebrew"
+	case Scoop:
+		return "scoop"
+	case SystemPackage:
+		return "system-package"
+	default:
+		return "standalone"
 	}
 }
 

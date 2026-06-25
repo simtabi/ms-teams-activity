@@ -103,8 +103,10 @@ func (m *model) adjustRow(dir int) {
 		m.edit.Input.Method = cycleMethod(m.edit.Input.Method, dir)
 	case rowInterval:
 		m.edit.Input.IntervalSeconds = clampInt(m.edit.Input.IntervalSeconds+dir*5, 5, 299)
+		// Jitter must stay below the interval (config.Validate enforces jitter < interval).
+		m.edit.Input.JitterSeconds = clampInt(m.edit.Input.JitterSeconds, 0, m.edit.Input.IntervalSeconds-1)
 	case rowJitter:
-		m.edit.Input.JitterSeconds = clampInt(m.edit.Input.JitterSeconds+dir*5, 0, 290)
+		m.edit.Input.JitterSeconds = clampInt(m.edit.Input.JitterSeconds+dir*5, 0, m.edit.Input.IntervalSeconds-1)
 	case rowPreventSleep:
 		m.edit.Input.PreventSleep = !m.edit.Input.PreventSleep
 	}

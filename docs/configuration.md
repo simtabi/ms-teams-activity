@@ -87,8 +87,10 @@ mta schedule clear
 - A window whose `end` is **not after** `start` is treated as **overnight**
   (e.g. `22:00`–`06:00`): the morning segment belongs to the day after a listed
   start day.
-- Multiple windows are OR-combined. DST transitions are handled by evaluating in
-  the configured zone.
+- Multiple windows are OR-combined. Evaluation happens in the configured zone, so
+  windows track DST. On the two DST-changeover days a window boundary may be off
+  by up to the one-hour shift for that day; pick interval/jitter with a little
+  margin if a hard boundary matters.
 
 ### Overrides ("at will")
 

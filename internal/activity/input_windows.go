@@ -87,7 +87,10 @@ func (w *windowsInput) Tick(_ context.Context) error {
 	w.mu.Lock()
 	defer w.mu.Unlock()
 
-	if w.preventSleep {
+	// Assert once; the engine goroutine is pinned to its OS thread (see
+	// engine.Run) so this thread-affine state is set and later cleared on the
+	// same thread.
+	if w.preventSleep && !w.held {
 		_, _, _ = procSetThreadExecutionStat.Call(uintptr(esContinuous | esSystemRequired | esDisplayRequired))
 		w.held = true
 	}

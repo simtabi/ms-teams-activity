@@ -95,10 +95,16 @@ func checkMacScreensaver(cfg config.Config, add func(checkLevel, string, string)
 	}
 	secs, err := strconv.Atoi(strings.TrimSpace(string(out)))
 	if err != nil {
+		add(levelWarn, "auto-lock", "could not parse screensaver idle time; ensure it exceeds the interval or is disabled")
 		return
 	}
 	if secs == 0 {
 		add(levelOK, "auto-lock", "screensaver disabled")
+		return
+	}
+	// Without a valid config we can't compare against the interval; just report.
+	if cfg.Input.IntervalSeconds <= 0 {
+		add(levelWarn, "auto-lock", fmt.Sprintf("screensaver starts after %ds; ensure it exceeds your input interval or is disabled", secs))
 		return
 	}
 	if secs <= cfg.Input.IntervalSeconds {

@@ -15,10 +15,25 @@ func TestDetectChannel(t *testing.T) {
 		{"/home/me/.local/bin/mta", Standalone},
 		{"/usr/local/bin/mta", Standalone},
 		{`C:\Tools\mta\mta.exe`, Standalone},
+		// "scoop" only as a substring (not a path segment) must NOT match.
+		{`C:\dev\scoopproject\bin\mta.exe`, Standalone},
+		{"/home/me/scooponics/mta", Standalone},
 	}
 	for _, tc := range cases {
 		if got := DetectChannel(tc.path); got != tc.want {
 			t.Errorf("DetectChannel(%q) = %v, want %v", tc.path, got, tc.want)
+		}
+	}
+}
+
+func TestChannelString(t *testing.T) {
+	cases := map[Channel]string{
+		Standalone: "standalone", Homebrew: "homebrew",
+		Scoop: "scoop", SystemPackage: "system-package",
+	}
+	for c, want := range cases {
+		if got := c.String(); got != want {
+			t.Errorf("Channel(%d).String() = %q, want %q", c, got, want)
 		}
 	}
 }

@@ -9,6 +9,7 @@ import (
 	"math/rand"
 	"os"
 	"path/filepath"
+	"runtime"
 	"time"
 
 	"github.com/fsnotify/fsnotify"
@@ -57,6 +58,13 @@ func New(scope config.Scope, configPath, runtimeDir, tokenPath string, dryRun bo
 
 // Run blocks until ctx is cancelled, then reverts all activators.
 func (e *Engine) Run(ctx context.Context) error {
+	// Pin this goroutine to its OS thread for the daemon's lifetime. All activator
+	// Tick/Stop calls happen here, and Windows' SetThreadExecutionState (sleep
+	// prevention) is thread-affine — without pinning, the goroutine could migrate
+	// threads between the "hold" and "release" calls, leaking the assertion.
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
+
 	cfg, err := config.Load(e.configPath)
 	if err != nil {
 		return err
