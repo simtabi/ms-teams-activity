@@ -1,7 +1,7 @@
 # Configuration
 
-Configuration is a single JSON file. Manage it with the CLI, the TUI settings
-pane (`vigil` → `c`), or the guided wizard:
+Configuration is a single JSON file. Manage it with the CLI, the TUI Settings
+screen (run `vigil`, then select **Settings**), or the guided wizard:
 
 ```bash
 vigil config wizard      # guided interactive setup (engine, tz, schedule, graph)
@@ -20,7 +20,7 @@ vigil config set input.method key
 # Schedule windows (not part of get/set):
 vigil schedule list
 vigil schedule add --days Mon,Tue,Wed,Thu,Fri --start 08:00 --end 17:00
-vigil schedule remove 1
+vigil schedule remove 0      # indices are 0-based (see `schedule list`)
 vigil schedule clear
 ```
 

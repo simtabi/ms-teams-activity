@@ -87,6 +87,18 @@ vigil self uninstall --purge    # also config + runtime data
 `--purge` (and `-Purge`) additionally delete the config and runtime/state
 directories; without it, those are left in place.
 
+## Choosing engine + scope
+
+```
+ which engine? ─┬─ input ─► must run in YOUR unlocked GUI session → --scope user
+                │            macOS: LaunchAgent · Linux: systemd --user
+                │            Windows: logon Scheduled Task
+                │            (vigil install refuses input + --scope system)
+                │
+                └─ graph ─► headless OK → --scope user OR system
+                             needs an admin-consented Presence.ReadWrite app
+```
+
 ## Scope: user vs system
 
 `--scope user` (default) installs a per-user service that runs in your desktop

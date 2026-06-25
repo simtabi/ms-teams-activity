@@ -68,9 +68,10 @@ Invalid input is rejected early with a clear message rather than acted on:
 ## Network status
 
 The TUI status strip shows a live connectivity dot — **green ● online** /
-**red ● offline** — and `vigil status` (`Internet:` line, `online` in `--json`)
-and `vigil doctor` (a `network` check) report the same. It matters for the Graph
-engine and self-update, which need a connection; the input engine does not.
+**red ● offline**. `vigil status` reports it as an `Internet: connected`/`offline`
+line (and `"online": true/false` under `--json`), and `vigil doctor` has a
+`network` check. It matters for the Graph engine and self-update, which need a
+connection; the input engine does not.
 
 Detection follows the standard captive-portal method: a tiny HTTP request to a
 well-known `generate_204` endpoint (Cloudflare, then Google) with a short timeout,

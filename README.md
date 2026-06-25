@@ -30,6 +30,21 @@ schedule, keeps the session non-idle with one of two **engines**:
 
 `both` runs them together. See the platform reliability notes below.
 
+```
+   Teams: Available ──(~5 min OS idle, or screen lock)──► Away
+
+   vigil, during your schedule, keeps you Available:
+
+     input engine ─► periodic human-like HID activity resets the OS idle timer
+                     Linux/Windows: reliable · macOS: keeps Teams green but
+                     can't beat a hardware lock
+     graph engine ─► sets a sticky "Available" via Microsoft Graph
+                     works through locks · needs admin-consented Presence.ReadWrite
+     both         ─► run them together
+
+   manual override (on / off / for 2h / until 17:00) always wins over the schedule
+```
+
 ### Platform reliability
 
 | OS | Mechanism | Reliability | Notes |

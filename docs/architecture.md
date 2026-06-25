@@ -1,5 +1,39 @@
 # Architecture
 
+## Control plane at a glance
+
+The front ends (CLI, TUI) never talk to the daemon directly — they coordinate
+through two small JSON files in the runtime dir, written atomically and watched
+with fsnotify. Only the daemon keeps long-lived OS state.
+
+```
+   ┌───────────┐                         ┌───────────┐
+   │ vigil CLI │                         │ vigil TUI │      front ends
+   └─────┬─────┘                         └─────┬─────┘
+         │  write override.json (atomic temp + rename)
+         └──────────────┬────────────────────┘
+                        ▼
+              ┌───────────────────┐   fsnotify (~1s)   ┌────────────────────────┐
+              │   override.json   │ ─────────────────► │  internal/engine       │
+              └───────────────────┘                    │  daemon loop           │
+              ┌───────────────────┐  written each cycle│  (single goroutine,    │
+              │   status.json     │ ◄───────────────── │   OS-thread pinned)    │
+              └─────────┬─────────┘                    │                        │
+                        │ read (status / TUI strip)    │  Desired =             │
+                        └───────── front ends ◄────────┤   override ?? schedule │
+                                                        └───────────┬────────────┘
+                                  active: Tick ±jitter  ┌───────────┘
+                       active→inactive / SIGTERM: Stop  │
+                                                        ▼
+                                  ┌─────────────────────────────────────┐
+                                  │ activators (internal/activity)      │
+                                  │   • input → resets the OS idle timer │
+                                  │            (per-OS virtual HID)      │
+                                  │   • graph → sets a sticky Teams      │
+                                  │            "Available" via the API   │
+                                  └─────────────────────────────────────┘
+```
+
 ## Components
 
 ```
@@ -32,6 +66,27 @@ On each cycle the engine:
 Config and override files are watched with fsnotify for ~1s hot-reload; an
 inactive engine still polls every 30s to catch schedule transitions. On
 SIGTERM/service stop, all activators are `Stop`-ped (graceful revert).
+
+Desired-state precedence (a manual override always wins over the schedule):
+
+```
+ read override.json
+        │
+        ├─ on                       ─────────────► DesiredActive = true
+        ├─ off                      ─────────────► DesiredActive = false
+        ├─ until T  ── T in future? ──┬─ yes ────► (the on/off it carries)
+        │                             └─ no  ────► expired → fall through
+        └─ none / expired           ─► schedule.Active(now) ? true : false
+                                                  │
+                              ┌───────── active? ─┴──────────┐
+                            yes                              no
+                              │                               │
+                  Tick activators (interval ± jitter)   idle; on a true→false
+                              │                          transition: Stop → revert
+                              ▼                               ▼
+                    OS idle reset / presence set        assertion released,
+                                                        presence cleared
+```
 
 ## Engines (`internal/activity`)
 

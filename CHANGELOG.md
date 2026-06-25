@@ -6,6 +6,15 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Documentation
+- Added ASCII diagrams: a control-plane/data-flow and a desired-state precedence
+  diagram in `architecture.md`, an engine+scope decision diagram in
+  `installation.md`, and a "how it works" diagram in the README.
+- Fixed two doc inaccuracies: the `schedule remove` example is now 0-based
+  (`remove 0`), and the Settings access note reflects the menu-driven TUI (run
+  `vigil`, select Settings) instead of the removed `c` shortcut. Clarified that
+  `vigil status` prints `Internet: connected`.
+
 ## [0.7.0] - 2026-06-25
 
 ### Added
