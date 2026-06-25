@@ -6,6 +6,14 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-06-25
+
+### Added
+- **Dynamic shell completion** (`vigil completion <bash|zsh|fish|powershell>`):
+  `config get`/`set` complete config keys; `config set <key>` completes values
+  (engine, input.method, booleans, log.level, and prefix-filtered timezones);
+  `schedule remove` completes window indices; `--scope` completes user/system.
+
 ## [0.6.0] - 2026-06-25
 
 ### Added
@@ -239,7 +247,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   `doctor`, `version`) and a Bubble Tea TUI dashboard.
 - `doctor` diagnostics for permissions, capabilities, and configuration.
 
-[Unreleased]: https://github.com/simtabi/vigil/compare/v0.6.0...HEAD
+[Unreleased]: https://github.com/simtabi/vigil/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/simtabi/vigil/releases/tag/v0.7.0
 [0.6.0]: https://github.com/simtabi/vigil/releases/tag/v0.6.0
 [0.5.2]: https://github.com/simtabi/vigil/releases/tag/v0.5.2
 [0.5.1]: https://github.com/simtabi/vigil/releases/tag/v0.5.1

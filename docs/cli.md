@@ -77,6 +77,27 @@ well-known `generate_204` endpoint (Cloudflare, then Google) with a short timeou
 falling back to a raw TCP dial. It is best-effort and silent on failure. The only
 outbound traffic is that small probe, made to detect connectivity.
 
+## Shell completion
+
+`vigil completion <bash|zsh|fish|powershell>` prints a completion script; run
+`vigil completion <shell> --help` for install instructions. Completion is
+**dynamic** where it helps:
+
+- `config get`/`config set` complete the dotted config keys;
+- `config set <key>` completes values — `engine` (input/graph/both),
+  `input.method` (mouse/key/zen), booleans (true/false), `log.level`, and
+  **timezones** (prefix-filtered from the full IANA list);
+- `schedule remove` completes the current window indices (annotated with their
+  days/times);
+- `--scope` completes `user`/`system`.
+
+```bash
+# zsh, current shell
+source <(vigil completion zsh)
+# bash, persistent
+vigil completion bash | sudo tee /etc/bash_completion.d/vigil >/dev/null
+```
+
 ## Honored environment variables
 
 `NO_COLOR`, `TERM`, `EDITOR` (used by `config edit`), and

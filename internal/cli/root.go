@@ -65,6 +65,7 @@ func init() {
 	pf.BoolVarP(&flagYes, "yes", "y", false, "assume yes to all confirmation prompts")
 	pf.BoolVar(&flagNoInput, "no-input", false, "never prompt; use safe defaults (for scripts)")
 	pf.BoolVar(&flagNoColor, "no-color", false, "disable colored output (also honors NO_COLOR)")
+	_ = rootCmd.RegisterFlagCompletionFunc("scope", completeScope)
 
 	// Validate global flags once and propagate UI settings before any command runs.
 	rootCmd.PersistentPreRunE = func(_ *cobra.Command, _ []string) error {
