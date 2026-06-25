@@ -6,6 +6,14 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.5.2] - 2026-06-25
+
+### Changed
+- **First-run onboarding is now a navigable menu** (↑/↓ + Enter), consistent with
+  the rest of the TUI, replacing the old single-key (`w`/`i`) prompts: choose
+  *Guided setup wizard*, *Write default config*, or *Quit*. After the wizard
+  finishes, the main menu loads automatically.
+
 ## [0.5.1] - 2026-06-25
 
 ### Changed
@@ -221,7 +229,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   `doctor`, `version`) and a Bubble Tea TUI dashboard.
 - `doctor` diagnostics for permissions, capabilities, and configuration.
 
-[Unreleased]: https://github.com/simtabi/vigil/compare/v0.5.1...HEAD
+[Unreleased]: https://github.com/simtabi/vigil/compare/v0.5.2...HEAD
+[0.5.2]: https://github.com/simtabi/vigil/releases/tag/v0.5.2
 [0.5.1]: https://github.com/simtabi/vigil/releases/tag/v0.5.1
 [0.5.0]: https://github.com/simtabi/vigil/releases/tag/v0.5.0
 [0.4.0]: https://github.com/simtabi/vigil/releases/tag/v0.4.0

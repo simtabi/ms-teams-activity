@@ -45,7 +45,8 @@ numbers, toggle booleans) · `Enter` edit a text field, `Enter` again to commit 
 
 ## First run
 
-With no config yet, the TUI opens a setup screen: press `w` for the guided
-wizard or `i` to write defaults, then the menu loads.
+With no config yet, the TUI opens a first-run **menu** (same ↑/↓ + Enter
+navigation as everywhere else): choose **Guided setup wizard**, **Write default
+config**, or **Quit**. Once a config exists, the main menu loads automatically.
 
 [← Docs index](../README.md#documentation)

@@ -194,6 +194,11 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, tea.Batch(netCheckCmd(), netTick())
 	case tickMsg:
 		m.refresh()
+		// If onboarding produced a config (e.g. the wizard finished), enter the menu.
+		if m.screen == screenOnboard && m.cfgErr == nil {
+			m.screen = screenMenu
+			m.subCursor = 0
+		}
 		return m, tick()
 	case tea.KeyMsg:
 		switch m.screen {
@@ -383,24 +388,51 @@ func (m model) updateAccount(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
-// ---- Onboarding ----
+// ---- Onboarding (first run; same navigable-menu pattern as everywhere else) ----
+
+var onboardItems = []struct{ key, label, desc string }{
+	{"wizard", "Guided setup wizard", "Recommended — choose engine, schedule, timezone"},
+	{"defaults", "Write default config", "Mon–Fri 08:00–17:00, input engine"},
+	{"quit", "Quit", ""},
+}
 
 func (m model) updateOnboard(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	switch msg.String() {
 	case "q", "ctrl+c":
 		return m, tea.Quit
-	case "i":
-		if err := config.Default().Save(m.opts.ConfigPath); err != nil {
-			m.flash = "init failed: " + err.Error()
-			return m, nil
+	case "up", "k":
+		m.subCursor = moveCursor(m.subCursor, len(onboardItems), -1)
+	case "down", "j":
+		m.subCursor = moveCursor(m.subCursor, len(onboardItems), +1)
+	case "enter", "right", "l":
+		switch onboardItems[m.subCursor].key {
+		case "wizard":
+			return m, m.execSelf("config", "wizard")
+		case "defaults":
+			if err := config.Default().Save(m.opts.ConfigPath); err != nil {
+				m.flash = "init failed: " + err.Error()
+				return m, nil
+			}
+			m.refresh()
+			m.subCursor = 0
+			m.screen = screenMenu
+			m.flash = "wrote default config"
+		case "quit":
+			return m, tea.Quit
 		}
-		m.refresh()
-		m.screen = screenMenu
-		m.flash = "wrote default config"
-	case "w":
-		return m, m.execSelf("config", "wizard")
 	}
 	return m, nil
+}
+
+func onboardLabels() []string {
+	out := make([]string, len(onboardItems))
+	for i, it := range onboardItems {
+		out[i] = it.label
+		if it.desc != "" {
+			out[i] += "  " + helpStyle.Render(it.desc)
+		}
+	}
+	return out
 }
 
 // ---- Styles ----
@@ -576,11 +608,12 @@ func (m model) helpView() string {
 func (m model) onboardView() string {
 	var b strings.Builder
 	b.WriteString(titleStyle.Render("  "+brand.Eye+" "+brand.Pretty+" — first run") + "\n\n")
-	b.WriteString(boxStyle.Render("No config found at:\n  "+m.opts.ConfigPath+"\n\nLet's set it up.") + "\n")
+	b.WriteString(boxStyle.Render("No config found at:\n  "+m.opts.ConfigPath+"\n\nChoose how to set it up.") + "\n\n")
+	b.WriteString(listView(onboardLabels(), m.subCursor) + "\n")
 	if m.flash != "" {
-		b.WriteString(flashStyle.Render("• "+m.flash) + "\n")
+		b.WriteString("\n" + flashStyle.Render("• "+m.flash) + "\n")
 	}
-	b.WriteString(helpStyle.Render("[w] guided setup wizard   [i] write defaults   [q] quit"))
+	b.WriteString("\n" + helpStyle.Render("↑/↓ move · enter select · q quit"))
 	return b.String()
 }
 

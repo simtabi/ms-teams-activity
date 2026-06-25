@@ -88,28 +88,50 @@ func cursorAt(m model, id menuID) model {
 
 // --- onboarding ---
 
+func onboardIndex(key string) int {
+	for i, it := range onboardItems {
+		if it.key == key {
+			return i
+		}
+	}
+	return -1
+}
+
 func TestOnboarding(t *testing.T) {
 	opts := testOpts(t, false)
 	m := newModel(opts)
 	if m.screen != screenOnboard {
 		t.Fatalf("no config should start on onboard, got %v", m.screen)
 	}
-	// 'i' writes a default config and goes to the menu.
-	m = press(m, "i")
+	// Onboarding is a navigable menu: cursor clamps at the top.
+	m = press(m, "up")
+	if m.subCursor != 0 {
+		t.Fatalf("onboard cursor should clamp at 0, got %d", m.subCursor)
+	}
+
+	// Select "Write default config" → writes config and enters the menu.
+	m.subCursor = onboardIndex("defaults")
+	m = press(m, "enter")
 	if m.screen != screenMenu {
-		t.Fatalf("after init expected menu, got %v", m.screen)
+		t.Fatalf("after default-config expected menu, got %v", m.screen)
 	}
 	if _, err := config.Load(opts.ConfigPath); err != nil {
 		t.Fatalf("config not written: %v", err)
 	}
 
-	// 'w' returns a (non-nil) wizard exec cmd.
-	m2 := newModel(testOpts(t, false))
-	if _, cmd := pressCmd(m2, "w"); cmd == nil {
-		t.Fatal("wizard key should return a command")
+	// "Guided setup wizard" returns a (non-nil) exec cmd.
+	w := newModel(testOpts(t, false))
+	w.subCursor = onboardIndex("wizard")
+	if _, cmd := pressCmd(w, "enter"); cmd == nil {
+		t.Fatal("wizard selection should return a command")
 	}
 
-	// 'q' quits.
+	// Selecting "Quit" (and the q shortcut) both quit.
+	q := newModel(testOpts(t, false))
+	q.subCursor = onboardIndex("quit")
+	if _, cmd := pressCmd(q, "enter"); !isQuit(cmd) {
+		t.Fatal("selecting Quit should quit")
+	}
 	if _, cmd := pressCmd(newModel(testOpts(t, false)), "q"); !isQuit(cmd) {
 		t.Fatal("q on onboard should quit")
 	}
