@@ -17,6 +17,20 @@ A header shows the eye mark (◉) + scope + version, a live **status strip** wit
 override · next change, and an **update banner** when a newer release exists. Menu
 items carry glyph icons (◉ ⏯ ▦ ⚙ ⛭ ◐ ⭮).
 
+```
+ vigil (on a terminal)
+   ├─ first run? ─► Onboard menu — Guided wizard · Write defaults · Quit
+   └─ main menu  (↑/↓ move · Enter select · Esc back · q quit)
+        ├─ ◉ Status            live state + recent log
+        ├─ ⏯ Override          submenu: force active/inactive (timed) · resume
+        ├─ ▦ Schedule          window editor (days · start · end)
+        ├─ ⚙ Settings          field editor — Timezone opens a searchable picker
+        ├─ ⛭ Service           submenu: install · start · stop · restart · uninstall
+        ├─ ◐ Account           submenu: sign in · status · sign out (Graph)
+        ├─ ⭮ Check for updates  runs `vigil upgrade`
+        └─ ? Help
+```
+
 ## Screens
 
 | Menu item | What it does |

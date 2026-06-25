@@ -7,9 +7,12 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ### Documentation
-- Added ASCII diagrams: a control-plane/data-flow and a desired-state precedence
-  diagram in `architecture.md`, an engine+scope decision diagram in
-  `installation.md`, and a "how it works" diagram in the README.
+- Added ASCII diagrams across the docs: control-plane/data-flow and desired-state
+  precedence (`architecture.md`), engine+scope decision (`installation.md`),
+  "how it works" (README), the Graph device-code + presence lifecycle
+  (`tools/graph-engine.md`), per-OS input mechanism (`tools/input-engine.md`), the
+  TUI navigation tree (`tui.md`), the self-update flow (`updating.md`), and the
+  release pipeline (`release.md`).
 - Fixed two doc inaccuracies: the `schedule remove` example is now 0-based
   (`remove 0`), and the Settings access note reflects the menu-driven TUI (run
   `vigil`, select Settings) instead of the removed `c` shortcut. Clarified that

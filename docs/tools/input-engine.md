@@ -21,6 +21,16 @@ below your OS auto-lock timeout. `jitter_seconds` randomizes the cadence.
 
 ## Per-OS behavior
 
+```
+                        ┌─ Windows ─► SendInput (real move / F15),
+                        │             runs as a logon Scheduled Task
+  reset the OS idle ────┼─ Linux ───► /dev/uinput virtual device
+  timer every           │             (real kernel events; X11 + Wayland)
+  interval ± jitter     └─ macOS ───► CGEventPost + IOPMAssertion —
+                                      keeps Teams green but CANNOT reset the
+                                      hardware idle timer (a lock still → Away)
+```
+
 ### Windows
 `SendInput` updates `GetLastInputInfo` reliably. The engine installs as a
 **logon Scheduled Task** so it runs in your interactive session (a session-0

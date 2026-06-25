@@ -17,6 +17,20 @@ Enable with `"engine": "graph"` (or `"both"`).
 - Preferred presence only takes effect while a Teams **presence session** exists
   (you're signed in to Teams somewhere). Otherwise presence shows Offline.
 
+```
+ device-code sign-in (vigil auth login)      presence lifecycle (daemon)
+ ─────────────────────────────────────       ───────────────────────────────
+ vigil ─► Entra: request device code          schedule becomes active
+       ◄─ user_code + verification_url               │ every refresh_minutes
+ you   ─► browser: enter code, sign in         setUserPreferredPresence
+ vigil ─► poll … ─► token cached (0600)              (availability/activity, PT8H)
+                                                     │
+                                               schedule ends / service stops
+                                                     │
+                                               clearUserPreferredPresence
+                                               → account reverts to automatic
+```
+
 ## One-time setup
 
 1. **Register an Entra application** (Microsoft Entra admin center → App

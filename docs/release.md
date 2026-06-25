@@ -58,6 +58,21 @@ make dist          # build + bundle everything the local toolchain supports
 
 ## Workflows
 
+```
+ git tag vX.Y.Z ─► release.yml
+                      │
+                      ├─ build-binaries.yml (reusable)
+                      │     ├─ cross job (Linux/Windows/BSD, CGO-free, 1 runner)
+                      │     └─ mac job  (darwin arm64+amd64 + universal, cgo)
+                      │            └─► dist/archives/*  (+ Windows .ico embedded)
+                      ▼
+                  release job ─► checksums.txt + CHANGELOG body ─► GitHub Release
+                      │
+                      └─ brew-scoop ─► update tap + bucket (best-effort, needs token)
+
+ push to main ─► ci.yml snapshot ─► same bundles as run artifacts (version 0.0.0-dev+sha)
+```
+
 > GoReleaser's `prebuilt` builder is Pro-only and the macOS backend needs cgo
 > (no Linux cross-compile), so builds run natively: Linux/Windows/BSD cross-
 > compile CGO-free on one Linux runner; macOS uses cgo on macOS runners.

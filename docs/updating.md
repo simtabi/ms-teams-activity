@@ -14,6 +14,20 @@ OS/arch, **verifies it against `checksums.txt`**, replaces the running binary,
 and — if a service/logon-task is installed — stops it around the swap and starts
 it again.
 
+```
+ vigil upgrade
+   ├─ dev build? ──────────► refuse (install a release); --check still works
+   ├─ package-managed? ────► refuse → brew / scoop / apt (see below)
+   └─ standalone:
+        check latest ─ newer? ─ no ─► "already up to date"
+                          │ yes
+                   confirm (or --yes)
+                          ▼
+        stop service ─► download + verify checksums.txt ─► replace binary
+                          ▼
+        restart service  (macOS: re-grant Accessibility — signature changed)
+```
+
 ## Package-manager installs
 
 If you installed through a package manager, `vigil upgrade` refuses and points you
